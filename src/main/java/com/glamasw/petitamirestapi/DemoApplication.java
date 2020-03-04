@@ -1,4 +1,4 @@
-package com.glamasw.petitamirestapu;
+package com.glamasw.petitamirestapi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
