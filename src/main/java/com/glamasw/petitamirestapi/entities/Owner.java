@@ -1,30 +1,26 @@
 package com.glamasw.petitamirestapi.entities;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "owner")
 public class Owner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "dueño_id")
+    @Column(name = "id")
     private int id;
-    @Column(name = "dueño_nombre")
+    @Column(name = "nombre")
     private String name;
-    @Column(name = "dueño_dni", unique = true)
-    private long dni;
-    @OneToMany(mappedBy = "dueño")
-    private ArrayList<Dog> dogs;
-    @OneToMany
-    @Column(name = "dueño_contactos")
-    private ArrayList<ContactMedium> contacts;
+    @Column(name = "dni", unique = true)
+    private int dni;
+    @OneToMany(mappedBy = "owner")
+    private List<Dog> dogs;
+    @OneToMany(mappedBy = "owner")
+    private List<ContactMedium> contacts;
     
 
     public Owner(){
@@ -48,15 +44,15 @@ public class Owner {
         this.name = name;
     }
 
-    public long getDni() {
+    public int getDni() {
         return dni;
     }
 
-    public void setDni(long dni) {
+    public void setDni(int dni) {
         this.dni = dni;
     }
 
-    public ArrayList<Dog> getDogs() {
+    public List<Dog> getDogs() {
         return dogs;
     }
 
@@ -64,7 +60,7 @@ public class Owner {
         this.dogs = dogs;
     }
 
-    public ArrayList<ContactMedium> getContacts() {
+    public List<ContactMedium> getContacts() {
         return contacts;
     }
 

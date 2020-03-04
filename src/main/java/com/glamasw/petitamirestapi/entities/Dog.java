@@ -11,18 +11,17 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "apirest_perro")
+@Table(name = "perro")
 public class Dog {
 
 
     @Id
-    @Column(name = "perro_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "perro_nombre")
+    @Column(name = "nombre")
     private String name;
     @ManyToOne()
-    @Column(name = "fk_dueño_perro")
     private Owner owner;
     
     
