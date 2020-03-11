@@ -12,6 +12,7 @@ import com.glamasw.petitamirestapi.entities.Owner;
 import com.glamasw.petitamirestapi.repositories.DogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DogService implements GenericService<DogDTO> {
@@ -20,6 +21,7 @@ public class DogService implements GenericService<DogDTO> {
     DogRepository repository;
 
     @Override
+    @Transactional
     public List<DogDTO> findAll() throws Exception {
 
         DogDTO dogDTO = new DogDTO();
@@ -50,10 +52,13 @@ public class DogService implements GenericService<DogDTO> {
     }
 
     @Override
+    @Transactional
     public DogDTO findById(int id) throws Exception {
         Optional<Dog> dogOptional = repository.findById(id);
         Dog dogEntity = new Dog();
         DogDTO dogDTO = new DogDTO();
+        ContactMediumDTO cmDTO = new ContactMediumDTO();
+        List<ContactMediumDTO> cmDTOs = new ArrayList<ContactMediumDTO>();
 
         try {
             dogEntity = dogOptional.get();
@@ -62,40 +67,82 @@ public class DogService implements GenericService<DogDTO> {
             dogDTO.setOwnerId(dogEntity.getOwner().getId());
             dogDTO.setOwnerName(dogEntity.getOwner().getName());
             dogDTO.setOwnerDNI(dogEntity.getOwner().getDni());
-            dogDTO.setContacts(dogEntity.getOwner().getContacts());
+            for (ContactMedium cm : dogEntity.getOwner().getContacts()) {
+                cmDTO.setNombre(cm.getNombre());
+                cmDTO.setValor(cm.getValor());
+                cmDTOs.add(cmDTO);
+            }
         } catch (Exception e) {
             throw new Exception();
         }
 
-        return null;
+        return dogDTO;
     }
 
     @Override
-    public DogDTO save(DogDTO dogDTO) {
+    @Transactional
+    public DogDTO save(DogDTO dogDTO) throws Exception {
         Dog dogEntity = new Dog();
         Owner ownerEntity = new Owner();
-        ContactMedium contactEntity = new ContactMedium();
+        ContactMedium cm = new ContactMedium();
+        List<ContactMedium> cms = new ArrayList<ContactMedium>();
         dogEntity.setName(dogDTO.getName());
-        ownerEntity.setName(dogDTO.getOwner().getName());
+        ownerEntity.setName(dogDTO.getName());
+        ownerEntity.setDni(dogDTO.getOwnerDNI());
+        for (ContactMediumDTO cmDTO : dogDTO.getContacts()) {
+            cm.setNombre(cmDTO.getNombre());
+            cm.setValor(cmDTO.getValor());
+            cms.add(cm);
+        }
 
         try {
-
+            repository.save(dogEntity);
+            dogDTO.setId(dogEntity.getId());
+            dogDTO.setOwnerId(dogEntity.getOwner().getId());
         } catch (Exception e) {
-
+            throw new Exception();
         }
-        return null;
+        return dogDTO;
     }
 
     @Override
-    public DogDTO update(DogDTO t, int id) {
-
-        return null;
+    @Transactional
+    public DogDTO update(DogDTO dogDTO, int id) throws Exception {
+        Optional<Dog> dOptional = repository.findById(id);
+        try {
+            Dog dogEntity = dOptional.get();
+            Owner ownerEntity = dogEntity.getOwner();
+            ContactMedium cm = new ContactMedium();
+            List<ContactMedium> cms = new ArrayList<ContactMedium>();
+            dogEntity.setId(dogDTO.getId());
+            dogEntity.setName(dogDTO.getName());
+            ownerEntity.setId(dogDTO.getOwnerId());
+            ownerEntity.setName(dogDTO.getName());
+            ownerEntity.setDni(dogDTO.getOwnerDNI());
+            for (ContactMediumDTO cmDTO : dogDTO.getContacts()) {
+                cm.setNombre(cmDTO.getNombre());
+                cm.setValor(cmDTO.getValor());
+                cms.add(cm);
+            }
+        } catch (Exception e) {
+            throw new Exception();
+        }
+        return dogDTO;
     }
 
     @Override
-    public boolean delete() {
-
-        return false;
+    @Transactional
+    public boolean delete(int id) throws Exception {
+        try {
+            if (repository.existsById(id)) {
+                repository.deleteById(id);
+                return true;
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            throw new Exception();
+        }
     }
 
 }

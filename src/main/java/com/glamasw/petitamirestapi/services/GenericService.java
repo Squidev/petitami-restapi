@@ -12,9 +12,9 @@ public interface GenericService <T> {
 
     public T findById(int id) throws Exception;
 
-    public T save(T t);
+    public T save(T t) throws Exception;
 
-    public T update(T t, int id);
+    public T update(T t, int id) throws Exception;
 
-    public boolean delete();
+    public boolean delete(int id) throws Exception;
 }

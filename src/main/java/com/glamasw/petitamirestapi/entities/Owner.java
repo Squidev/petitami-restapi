@@ -21,10 +21,8 @@ public class Owner {
     private List<Dog> dogs;
     @OneToMany(mappedBy = "owner")
     private List<ContactMedium> contacts;
-    
 
-    public Owner(){
-
+    public Owner() {
 
     }
 
@@ -68,6 +66,4 @@ public class Owner {
         this.contacts = contacts;
     }
 
-    
-    
 }

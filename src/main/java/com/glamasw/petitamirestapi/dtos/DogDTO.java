@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.swing.ImageIcon;
 
-import com.glamasw.petitamirestapi.entities.ContactMedium;
-import com.glamasw.petitamirestapi.entities.Owner;
 
 public class DogDTO {
 
