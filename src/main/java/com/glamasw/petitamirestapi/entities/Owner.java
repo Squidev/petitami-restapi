@@ -13,14 +13,14 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    @Column(name = "nombre")
+    @Column(name = "name")
     private String name;
     @Column(name = "dni", unique = true)
     private int dni;
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", orphanRemoval = true)
     private List<Dog> dogs;
-    @OneToMany(mappedBy = "owner")
-    private List<ContactMedium> contacts;
+    @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ContactMedium> contactMediums;
 
     public Owner() {
 
@@ -58,12 +58,12 @@ public class Owner {
         this.dogs = dogs;
     }
 
-    public List<ContactMedium> getContacts() {
-        return contacts;
+    public List<ContactMedium> getContactMediums() {
+        return contactMediums;
     }
 
-    public void setContacts(ArrayList<ContactMedium> contacts) {
-        this.contacts = contacts;
+    public void setContactMediums(ArrayList<ContactMedium> contactMediums) {
+        this.contactMediums = contactMediums;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.glamasw.petitamirestapu;
+package com.glamasw.petitamirestapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

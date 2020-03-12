@@ -3,18 +3,19 @@ package com.glamasw.petitamirestapi.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "medio_contacto")
+@Table(name = "contact_medium")
 public class ContactMedium {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    @Column(name = "nombre")
-    private String nombre;
-    @Column(name = "valor")
-    private String valor;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "value")
+    private String value;
     @ManyToOne
+    @JoinColumn(name = "fk_owner", nullable = false)
     private Owner owner;
 
     public ContactMedium() {
@@ -28,19 +29,19 @@ public class ContactMedium {
         this.id = id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getValor() {
-        return valor;
+    public String getValue() {
+        return value;
     }
 
-    public void setValor(String valor) {
-        this.valor = valor;
+    public void setValue(String value) {
+        this.value = value;
     }
 }

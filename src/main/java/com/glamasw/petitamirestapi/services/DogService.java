@@ -37,9 +37,9 @@ public class DogService implements GenericService<DogDTO> {
                 dogDTO.setOwnerId(dog.getOwner().getId());
                 dogDTO.setOwnerName(dog.getOwner().getName());
                 dogDTO.setOwnerDNI(dog.getOwner().getDni());
-                for (ContactMedium cm : dog.getOwner().getContacts()) {
-                    cmDTO.setNombre(cm.getNombre());
-                    cmDTO.setValor(cm.getValor());
+                for (ContactMedium cm : dog.getOwner().getContactMediums()) {
+                    cmDTO.setNombre(cm.getName());
+                    cmDTO.setValor(cm.getValue());
                     cmDTOs.add(cmDTO);
                 }
                 dogDTO.setContacts(cmDTOs);
@@ -67,9 +67,9 @@ public class DogService implements GenericService<DogDTO> {
             dogDTO.setOwnerId(dogEntity.getOwner().getId());
             dogDTO.setOwnerName(dogEntity.getOwner().getName());
             dogDTO.setOwnerDNI(dogEntity.getOwner().getDni());
-            for (ContactMedium cm : dogEntity.getOwner().getContacts()) {
-                cmDTO.setNombre(cm.getNombre());
-                cmDTO.setValor(cm.getValor());
+            for (ContactMedium cm : dogEntity.getOwner().getContactMediums()) {
+                cmDTO.setNombre(cm.getName());
+                cmDTO.setValor(cm.getValue());
                 cmDTOs.add(cmDTO);
             }
         } catch (Exception e) {
@@ -89,9 +89,10 @@ public class DogService implements GenericService<DogDTO> {
         dogEntity.setName(dogDTO.getName());
         ownerEntity.setName(dogDTO.getName());
         ownerEntity.setDni(dogDTO.getOwnerDNI());
+        ownerEntity.getDogs().add(dogEntity);
         for (ContactMediumDTO cmDTO : dogDTO.getContacts()) {
-            cm.setNombre(cmDTO.getNombre());
-            cm.setValor(cmDTO.getValor());
+            cm.setName(cmDTO.getNombre());
+            cm.setValue(cmDTO.getValor());
             cms.add(cm);
         }
 
@@ -119,9 +120,10 @@ public class DogService implements GenericService<DogDTO> {
             ownerEntity.setId(dogDTO.getOwnerId());
             ownerEntity.setName(dogDTO.getName());
             ownerEntity.setDni(dogDTO.getOwnerDNI());
+            ownerEntity.getDogs().add(dogEntity);
             for (ContactMediumDTO cmDTO : dogDTO.getContacts()) {
-                cm.setNombre(cmDTO.getNombre());
-                cm.setValor(cmDTO.getValor());
+                cm.setName(cmDTO.getNombre());
+                cm.setValue(cmDTO.getValor());
                 cms.add(cm);
             }
         } catch (Exception e) {

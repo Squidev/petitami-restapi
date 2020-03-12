@@ -1,15 +1,9 @@
 package com.glamasw.petitamirestapi.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name = "perro")
+@Table(name = "dog")
 public class Dog {
 
 
@@ -17,9 +11,10 @@ public class Dog {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "nombre")
+    @Column(name = "name")
     private String name;
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "fk_owner", nullable = false)
     private Owner owner;
     
     
