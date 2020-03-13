@@ -7,7 +7,7 @@ public class DogDTO {
 
     private int dogId;
     private String dogName;
-//  private ImageIcon image;
+//  private byte[] photo;
 //  private String description;
     private int ownerId;
     private String ownerName;
@@ -65,12 +65,4 @@ public class DogDTO {
     public void setContactMediumDTOS(List<ContactMediumDTO> contactMediumDTOS) {
         this.contactMediumDTOS = contactMediumDTOS;
     }
-
-
-
-
-
-    
-
-    
 }
