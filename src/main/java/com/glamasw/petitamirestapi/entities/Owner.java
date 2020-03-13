@@ -54,7 +54,7 @@ public class Owner {
         return dogs;
     }
 
-    public void setDogs(ArrayList<Dog> dogs) {
+    public void setDogs(List<Dog> dogs) {
         this.dogs = dogs;
     }
 
@@ -62,7 +62,7 @@ public class Owner {
         return contactMediums;
     }
 
-    public void setContactMediums(ArrayList<ContactMedium> contactMediums) {
+    public void setContactMediums(List<ContactMedium> contactMediums) {
         this.contactMediums = contactMediums;
     }
 

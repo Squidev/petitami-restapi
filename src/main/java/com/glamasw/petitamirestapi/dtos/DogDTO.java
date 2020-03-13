@@ -2,54 +2,36 @@ package com.glamasw.petitamirestapi.dtos;
 
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
 
 public class DogDTO {
 
-    private int id;
-    private String name;
-    private ImageIcon image;
-    private String description;
+    private int dogId;
+    private String dogName;
+//  private ImageIcon image;
+//  private String description;
     private int ownerId;
     private String ownerName;
     private int ownerDNI;
-    private List<ContactMediumDTO> contacts;
+    private List<ContactMediumDTO> contactMediumDTOS;
 
     public DogDTO() {
 
     }
 
-    public int getId() {
-        return id;
+    public int getDogId() {
+        return dogId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setDogId(int dogId) {
+        this.dogId = dogId;
     }
 
-    public String getName() {
-        return name;
+    public String getDogName() {
+        return dogName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public ImageIcon getImage() {
-        return image;
-    }
-
-    public void setImage(ImageIcon image) {
-        this.image = image;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDogName(String dogName) {
+        this.dogName = dogName;
     }
 
     public int getOwnerId() {
@@ -76,12 +58,12 @@ public class DogDTO {
         this.ownerDNI = ownerDNI;
     }
 
-    public List<ContactMediumDTO> getContacts() {
-        return contacts;
+    public List<ContactMediumDTO> getContactMediumDTOS() {
+        return contactMediumDTOS;
     }
 
-    public void setContacts(List<ContactMediumDTO> contacts) {
-        this.contacts = contacts;
+    public void setContactMediumDTOS(List<ContactMediumDTO> contactMediumDTOS) {
+        this.contactMediumDTOS = contactMediumDTOS;
     }
 
 

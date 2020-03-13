@@ -5,27 +5,36 @@ package com.glamasw.petitamirestapi.dtos;
  */
 public class ContactMediumDTO {
 
-    private String nombre;
-    private String valor;
+    private int id;
+    private String name;
+    private String value;
 
     public ContactMediumDTO(){
 
     }
 
-    public String getNombre() {
-        return nombre;
+    public int getId() {
+        return id;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getValor() {
-        return valor;
+    public String getName() {
+        return name;
     }
 
-    public void setValor(String valor) {
-        this.valor = valor;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     
