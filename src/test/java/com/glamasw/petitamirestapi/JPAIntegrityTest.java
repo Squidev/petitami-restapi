@@ -1,7 +1,6 @@
 package com.glamasw.petitamirestapi;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.glamasw.petitamirestapi.entities.Dog;
 import com.glamasw.petitamirestapi.entities.Owner;

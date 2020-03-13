@@ -2,14 +2,11 @@ package com.glamasw.petitamirestapi.dtos;
 
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
-
 public class DogDTO {
 
     private int id;
     private String name;
-    private ImageIcon image;
+    private byte[] photo;
     private String description;
     private int ownerId;
     private String ownerName;
@@ -36,12 +33,12 @@ public class DogDTO {
         this.name = name;
     }
 
-    public ImageIcon getImage() {
-        return image;
+    public byte[] getPhoto() {
+        return photo;
     }
 
-    public void setImage(ImageIcon image) {
-        this.image = image;
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 
     public String getDescription() {
@@ -83,12 +80,4 @@ public class DogDTO {
     public void setContacts(List<ContactMediumDTO> contacts) {
         this.contacts = contacts;
     }
-
-
-
-
-
-    
-
-    
 }

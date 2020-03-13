@@ -1,11 +1,11 @@
 package com.glamasw.petitamirestapi.entities;
 
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "dog")
 public class Dog {
-
 
     @Id
     @Column(name = "id")
@@ -13,13 +13,14 @@ public class Dog {
     private int id;
     @Column(name = "name")
     private String name;
+    @Lob
+    @Column(name = "photo")
+    private byte[] photo;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fk_owner", nullable = false)
     private Owner owner;
-    
-    
-    public Dog() {
 
+    public Dog() {
 
     }
 
@@ -39,6 +40,14 @@ public class Dog {
         this.name = name;
     }
 
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
+
     public Owner getOwner() {
         return owner;
     }
@@ -46,6 +55,4 @@ public class Dog {
     public void setOwner(Owner owner) {
         this.owner = owner;
     }
-
-
 }

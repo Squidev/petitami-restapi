@@ -87,6 +87,7 @@ public class DogService implements GenericService<DogDTO> {
         ContactMedium cm = new ContactMedium();
         List<ContactMedium> cms = new ArrayList<ContactMedium>();
         dogEntity.setName(dogDTO.getName());
+        dogEntity.setPhoto(dogDTO.getPhoto());
         ownerEntity.setName(dogDTO.getName());
         ownerEntity.setDni(dogDTO.getOwnerDNI());
         ownerEntity.getDogs().add(dogEntity);
