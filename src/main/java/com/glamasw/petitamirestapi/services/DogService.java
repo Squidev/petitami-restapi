@@ -1,8 +1,6 @@
 package com.glamasw.petitamirestapi.services;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import com.glamasw.petitamirestapi.dtos.ContactMediumDTO;
 import com.glamasw.petitamirestapi.dtos.DogDTO;
@@ -41,7 +39,7 @@ public class DogService implements GenericService<DogDTO> {
                 dogDTO.setOwnerName(dog.getOwner().getName());
                 dogDTO.setOwnerDNI(dog.getOwner().getDni());
                 for (ContactMedium cm : dog.getOwner().getContactMediums()) {
-                    cmDTO.setName(cm.getName());
+                    cmDTO.setName(cm.getType());
                     cmDTO.setValue(cm.getValue());
                     cmDTOs.add(cmDTO);
                 }
@@ -71,14 +69,13 @@ public class DogService implements GenericService<DogDTO> {
             dogDTO.setOwnerName(dogEntity.getOwner().getName());
             dogDTO.setOwnerDNI(dogEntity.getOwner().getDni());
             for (ContactMedium cm : dogEntity.getOwner().getContactMediums()) {
-                cmDTO.setName(cm.getName());
+                cmDTO.setName(cm.getType());
                 cmDTO.setValue(cm.getValue());
                 cmDTOs.add(cmDTO);
             }
         } catch (Exception e) {
             throw new Exception();
         }
-
         return dogDTO;
     }
 
@@ -101,7 +98,7 @@ public class DogService implements GenericService<DogDTO> {
                 //Creación de los ContactMediums a partir del DTO.
                 for (ContactMediumDTO contactMediumDTO : dogDTO.getContactMediumDTOS()) {
                     ContactMedium contactMediumEntity = new ContactMedium();
-                    contactMediumEntity.setName(contactMediumDTO.getName());
+                    contactMediumEntity.setType(contactMediumDTO.getName());
                     contactMediumEntity.setValue(contactMediumDTO.getValue());
                     contactMediums.add(contactMediumEntity);
                 }
@@ -127,11 +124,22 @@ public class DogService implements GenericService<DogDTO> {
                 //Por cada ContactMediumDTO, guardamos los nuevos (id==0) y actualizamos los existentes (id!=)
                 for (ContactMediumDTO contactMediumDTO: dogDTO.getContactMediumDTOS()) {
                     ContactMedium contactMedium = new ContactMedium();
+                    if (contactMediumDTO.getId() != 0) {        //Si el id no es 0, lo seteamos, sino lo dejamos vacío para que se genere al momento de guardarse.
+                        contactMedium.setId(contactMediumDTO.getId());
+                    }
+                    contactMedium.setType(contactMediumDTO.getName());
+                    contactMedium.setValue(contactMediumDTO.getValue());
+                    contactMediums.add(contactMedium);
+
+                    /*Condicional para el caso en el que haya que discriminar entre guardar los nuevos y actualizar los existentes.
                     if (contactMediumDTO.getId() == 0) {
                         contactMedium.setName(contactMediumDTO.getName());
                         contactMedium.setValue(contactMediumDTO.getValue());
-                        //ownerRepository.save()
+                        contactMediums.add(contactMedium);
                     }
+                    if (contactMediumDTO != 0) {
+
+                    }*/
                 }
             }
             return dogDTO;
@@ -156,7 +164,7 @@ public class DogService implements GenericService<DogDTO> {
             ownerEntity.setDni(dogDTO.getOwnerDNI());
             ownerEntity.getDogs().add(dogEntity);
             for (ContactMediumDTO cmDTO : dogDTO.getContactMediumDTOS()) {
-                cm.setName(cmDTO.getName());
+                cm.setType(cmDTO.getName());
                 cm.setValue(cmDTO.getValue());
                 cms.add(cm);
             }
@@ -180,5 +188,4 @@ public class DogService implements GenericService<DogDTO> {
             throw new Exception();
         }
     }
-
 }

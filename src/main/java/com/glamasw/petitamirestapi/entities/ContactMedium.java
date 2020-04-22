@@ -1,6 +1,8 @@
 package com.glamasw.petitamirestapi.entities;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "contact_medium")
@@ -10,12 +12,15 @@ public class ContactMedium {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    @Column(name = "name")
-    private String name;
+    @NotBlank(message = "El tipo de ContactMedium no puede estar vacío")
+    @Column(name = "type")
+    private String type;
+    @NotBlank(message = "El valor de ContactMedium no puede estar vacío")
     @Column(name = "value")
     private String value;
-    @ManyToOne
-    @JoinColumn(name = "fk_owner", nullable = false)
+    @NotNull
+    @ManyToOne()
+    @JoinColumn(name = "fk_owner")
     private Owner owner;
 
     public ContactMedium() {
@@ -29,12 +34,12 @@ public class ContactMedium {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getValue() {
@@ -43,5 +48,13 @@ public class ContactMedium {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public Owner getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Owner owner) {
+        this.owner = owner;
     }
 }

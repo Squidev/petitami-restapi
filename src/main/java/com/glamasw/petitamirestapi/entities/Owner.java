@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "owner")
@@ -13,12 +16,15 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
+    @NotBlank(message = "El nombre del dueño de la mascota no puede estar vacío")
     @Column(name = "name")
     private String name;
     @Column(name = "dni", unique = true)
     private int dni;
-    @OneToMany(mappedBy = "owner", orphanRemoval = true)
+    @NotEmpty(message = "La lista de Dog no puede estar vacía") //La anotación NotEmpty incluye también la validación de que la colección no tenga asociado un valor null.
+    @OneToMany(mappedBy = "dogOwner", orphanRemoval = true)
     private List<Dog> dogs;
+    @NotEmpty(message = "La lista de ContactMedium no puede estar vacía")
     @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ContactMedium> contactMediums;
 

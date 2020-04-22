@@ -1,14 +1,18 @@
-package com.glamasw.petitamirestapi;
+package com.glamasw.petitamirestapi.UnitTests;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.glamasw.petitamirestapi.dtos.ContactMediumDTO;
+import com.glamasw.petitamirestapi.dtos.DogDTO;
 import com.glamasw.petitamirestapi.entities.ContactMedium;
 import com.glamasw.petitamirestapi.entities.Dog;
 import com.glamasw.petitamirestapi.entities.Owner;
-import com.glamasw.petitamirestapi.repositories.OwnerRepository;
 import com.glamasw.petitamirestapi.services.DogService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,39 +21,35 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 @TestPropertySource(locations = "classpath:application.properties")
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Execution(ExecutionMode.CONCURRENT)
-
-public class OwnerRepositoryTest {
+public class DogServiceTests {
 
     @Autowired
-    OwnerRepository ownerRepository;
+    DogService dogService;
 
     @Test
-    @DisplayName("Find Owner by DNI")
-    void findByDni() throws Exception {
-
+    @DisplayName("DogService save() method test: No contact mediums provided")
+    public void saveNoContactMediums() throws Exception {
+        //Entities init
+        DogDTO dogDTO = new DogDTO();
+        //Atributes setting
+        dogDTO.setDogName("Chocoperro");
+        dogDTO.setOwnerName("Cochoperro Owner");
+        dogDTO.setOwnerDNI(49784584);
+        dogDTO.setContactMediumDTOS(new ArrayList<>());
+        //Persist dogDTO
         try {
-
-            for (int i = 1; i <= 5; i++) {
-                Owner owner = new Owner();
-                owner.setName("Chocoperro Owner "+ i);
-                owner.setDni(49578150+i);
-                owner.setDogs(new ArrayList<>());
-                owner.setContactMediums(new ArrayList<>());
-                ownerRepository.save(owner);
-                System.out.println(i);
-            }
-            Optional<Owner> optionalOwner = ownerRepository.findByDni(49578151);
-            Owner resultOwner = optionalOwner.get();
-            assertTrue(resultOwner.getName().contentEquals("Chocoperro Owner 1"));
+            dogDTO = dogService.save(dogDTO);
         } catch (Exception e) {
             throw new Exception();
         }
+        assertTrue(dogDTO.getContactMediumDTOS().isEmpty());
     }
+
+
 }

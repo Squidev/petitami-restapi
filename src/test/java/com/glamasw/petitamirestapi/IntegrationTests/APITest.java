@@ -1,8 +1,7 @@
-package com.glamasw.petitamirestapi;
+package com.glamasw.petitamirestapi.IntegrationTests;
 
 import com.glamasw.petitamirestapi.controllers.DogController;
 import com.glamasw.petitamirestapi.entities.ContactMedium;
-import com.glamasw.petitamirestapi.services.DogService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -27,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Execution(ExecutionMode.CONCURRENT)
+@Execution(ExecutionMode.SAME_THREAD)
 public class APITest {
 
     @Autowired
@@ -64,17 +63,17 @@ public class APITest {
         List<ContactMedium> contactMediums = new ArrayList();
 
         ContactMedium contactMedium1 = new ContactMedium();
-        contactMedium1.setName("\"Facebook\"");
+        contactMedium1.setType("\"Facebook\"");
         contactMedium1.setValue("\"www.facebook.com/" + ownerName.replace(" ","") + "\"");
         contactMediums.add(contactMedium1);
 
         ContactMedium contactMedium2 = new ContactMedium();
-        contactMedium2.setName("\"Instagram\"");
+        contactMedium2.setType("\"Instagram\"");
         contactMedium2.setValue("\"www.instagram.com/"+ownerName.replace(" ","") + "\"");
         contactMediums.add(contactMedium2);
 
         ContactMedium contactMedium3 = new ContactMedium();
-        contactMedium3.setName("\"WhatsApp\"");
+        contactMedium3.setType("\"WhatsApp\"");
         contactMedium3.setValue("\"261487154"+repetitionInfo.getCurrentRepetition() + "\"");
         contactMediums.add(contactMedium3);
 
@@ -90,8 +89,8 @@ public class APITest {
                 .andReturn();
 
         //Asserts
-        System.out.println(dogJSON);
-        System.out.println(result.toString());
+        System.out.println("dogJSON: "+dogJSON);
+        System.out.println("result.toString(): "+result.toString());
         assertEquals(dogJSON, result.toString());
     }
 
@@ -100,7 +99,7 @@ public class APITest {
         String stringifiedContactMediums = "[";
         //Se convierte cada ContactMedium a su formato JSON y se añade al String.
         for (ContactMedium cm: contactMediums) {
-            stringifiedContactMediums = stringifiedContactMediums + "{contactMediumName: "+cm.getName()+", contactMediumValue: "+cm.getValue()+"}";
+            stringifiedContactMediums = stringifiedContactMediums + "{contactMediumName: "+cm.getType()+", contactMediumValue: "+cm.getValue()+"}";
             //Si no se llegó al final del array, se agrega una "," para separar los JSON.
             if (contactMediums.indexOf(cm)!=contactMediums.toArray().length-1){
                 stringifiedContactMediums += ", ";
