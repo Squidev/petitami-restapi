@@ -3,18 +3,23 @@ package com.glamasw.petitamirestapi.entities;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.UUID;
 
 @Entity
-@Table(name = "dog")
-public class Dog {
+@Table(name = "pet")
+public class Pet {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotBlank(message = "El nombre de la mascota no puede estar vacío")     //La anotación NotBlank incluye también la validación de que la String no tenga asociado un valor null.
+    @NotBlank(message = "El UUID de la mascota no debe estar vacío")    //La anotación NotBlank incluye también la validación de que la String no tenga asociado un valor null.
+    @Column(name = "uuid", unique = true)
+    private String uuid;
+    @NotBlank(message = "El nombre de la mascota no puede estar vacío")
     @Column(name = "name")
     private String name;
     @NotNull(message = "La descripción de la mascota debe apuntar a una String válida")
@@ -22,10 +27,10 @@ public class Dog {
     private String description;
     @Lob
     @Column(name = "photo")
-    private byte[] photo;
-        @ManyToOne(cascade = CascadeType.PERSIST)
+    private byte[] photo = null;
+    @ManyToOne
     @JoinColumn(name = "fk_owner", nullable = false)    //If null, throws DataIntegrityViolationException, with a nested ConstraintViolationException
-    @NotNull(message = "El perro debe estar relacionado con algún dueño") //If null, throws ConstraintViolationException
+    @NotNull(message = "La mascota debe estar relacionada con algún dueño") //If null, throws ConstraintViolationException
     private Owner owner;
     /*If both "@NotNull" and "nullable" are used, @NotNull validation applies first
 
@@ -49,8 +54,8 @@ public class Dog {
     We must then only make sure that hibernate.validator.apply_to_ddl property is set to true.
     Source: https://www.baeldung.com/hibernate-notnull-vs-nullable
     */
-    public Dog() {
-
+    public Pet() {
+        uuid = UUID.randomUUID().toString();
     }
 
     public int getId() {
@@ -59,6 +64,14 @@ public class Dog {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {
@@ -93,10 +106,10 @@ public class Dog {
         this.owner = owner;
     }
 
-/*  Función equals() (Analizando si actually it's worth implementing)
+    //Función equals() (Analizando si actually it's worth implementing)
 
-    //Overriding equals() to compare two Dog objects
-    //La idea de implementar este método es que en los tests podamos utilizar assertEquals() para verificar si dos Dog son estructuralmente el mismo objeto.
+    //Overriding equals() to compare two Pet objects
+    //La idea de implementar este método es que en los tests podamos utilizar assertEquals() para verificar si dos Pet son estructuralmente el mismo objeto.
     //assertEquals() utiliza la función equals() para hacer la comparación. En caso de no estar redefinido dicho método en la clase, por defecto simplemente se compara
     //si los valores de los punteros son iguales.
     @Override
@@ -108,12 +121,12 @@ public class Dog {
         }
 
         //Check if obj is an instance of Dog or not. "null instanceof [type]" also returns false
-        if (!(obj instanceof Dog)) {
+        if (!(obj instanceof Pet)) {
             return false;
         }
 
         //Typecast obj to Dog so that we can compare data members
-        Dog dog = (Dog) obj;
+        Pet pet = (Pet) obj;
 
         //Compare the data members and return accordingly
         //Aquí nos encontramos con un conundrum(awante Sabrina y su vocabulario papá). Lo ideal es comparar miembro por miembro los dos objetos para determinar
@@ -133,22 +146,17 @@ public class Dog {
         //Una solución a esto es fijarnos si existen claves primarias naturales (DNI, nroFactura, productUUID, etc.) en nuestro sistema cuyo valor sea conocido antes de
         //persistir el objeto y que podamos aprovechar para realizar dicha comparación.
 
-        if
-        for (ContactMedium cm: this.getOwner().getContactMediums()) {
-
-        }
-
-
-        return id == dog.getId()
-                && name.compareTo(dog.getName()) == 0
-                && description.compareTo(dog.getDescription()) == 0
-                && photo.equals(dog.getPhoto())
-                && owner.getId() == dog.getOwner().getId()
-                && owner.getName().compareTo(dog.getOwner().getName()) == 0
-                && owner.getDni() == dog.getOwner().getDni()
-                && owner.getContactMediums().
-
+        return id == pet.getId() &&
+                uuid.compareTo(pet.getUuid()) == 0 &&
+                name.compareTo(pet.getName()) == 0 &&
+                description.compareTo(pet.getDescription()) == 0 &&
+                Arrays.equals(photo, pet.getPhoto());
     }
-}
-*/
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(id, uuid, name, description);
+        result = 31 * result + Arrays.hashCode(photo);
+        return result;
+    }
 }

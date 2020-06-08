@@ -1,6 +1,6 @@
 package com.glamasw.petitamirestapi.controllers;
 
-import com.glamasw.petitamirestapi.dtos.DogDTO;
+import com.glamasw.petitamirestapi.dtos.PetDTO;
 
 import org.springframework.http.ResponseEntity;
 
@@ -10,13 +10,13 @@ import org.springframework.http.ResponseEntity;
 
 public interface GenericController {
 
-    public ResponseEntity getAll();
+    ResponseEntity getAll();
 
-    public ResponseEntity getOne(int id);
+    ResponseEntity getOne(int id);
 
-    public ResponseEntity post(DogDTO dogDTO);
+    ResponseEntity post(PetDTO petDTO);
 
-    public ResponseEntity put(DogDTO dogDTO, int id);
+    ResponseEntity put(PetDTO petDTO, int id);
 
-    public ResponseEntity delete(int id);
+    ResponseEntity delete(int id);
 }

@@ -1,9 +1,9 @@
 package com.glamasw.petitamirestapi.IntegrationTests;
 
 import com.glamasw.petitamirestapi.entities.ContactMedium;
-import com.glamasw.petitamirestapi.entities.Dog;
+import com.glamasw.petitamirestapi.entities.Pet;
 import com.glamasw.petitamirestapi.entities.Owner;
-import com.glamasw.petitamirestapi.repositories.DogRepository;
+import com.glamasw.petitamirestapi.repositories.OwnerRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DataIntegrityTests {
 
     @Autowired
-    DogRepository dogRepository;
+    OwnerRepository ownerRepository;
 
     /*-------------------------------------------
     AAA Testing
@@ -36,29 +36,25 @@ public class DataIntegrityTests {
     //la noobiness.
 
     @Test
-    @DisplayName("Save Dog - Blank name - Should fail")
-    public void saveDog_blankName_shouldFail(final TestInfo testInfo) {
+    @DisplayName("Save Pet - Blank name - Should fail")
+    public void savePet_blankName_shouldFail(final TestInfo testInfo) {
         //ARRANGE PHASE
-        //Creation of invalid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("");
-        dogEntity.setDescription("Good boy");
+        //Creation of invalid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("");
+        petEntity.setDescription("Good boy");
         //Creation of valid Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setName("John");
         ownerEntity.setDni(23456789);
-        ownerEntity.setDogs(new ArrayList<>());
-        ownerEntity.getDogs().add(dogEntity);
-        dogEntity.setOwner(ownerEntity);
-        ownerEntity.setContactMediums(new ArrayList<>());
+        ownerEntity.addPet(petEntity);
         //Creation of valid ContactMedium
         ContactMedium contactMedium = new ContactMedium();
         contactMedium.setType("Facebook");
         contactMedium.setValue("www.facebook.com/John");
-        contactMedium.setOwner(ownerEntity);
-        ownerEntity.getContactMediums().add(contactMedium);
+        ownerEntity.addContactMedium(contactMedium);
         //ACT AND ASSERT PHASE
-        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> dogRepository.save(dogEntity));   //Exception arrojada debido a la violación de la restricción definida por @NotBlank
+        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));   //Exception arrojada debido a la violación de la restricción definida por @NotBlank
         //If no exception is thrown, or if an exception of a different type is thrown, this method will fail.
         //The method assertThrows returns the thrown exception. Then below you can do whatever sort of assertions on the exception object you want.
         System.out.println(e.toString());
@@ -66,30 +62,26 @@ public class DataIntegrityTests {
     }
 
     @Test
-    @DisplayName("Save Dog - Null description - Should fail")
-    public void saveDog_nullDescription_shouldFail(final TestInfo testInfo) {
+    @DisplayName("Save Pet - Null description - Should fail")
+    public void savePet_nullDescription_shouldFail(final TestInfo testInfo) {
         //ARRANGE PHASE
-        //Creation of invalid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
+        //Creation of invalid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
         //Creation of valid Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setName("John");
         ownerEntity.setDni(23456789);
-        ownerEntity.setDogs(new ArrayList<>());
-        ownerEntity.getDogs().add(dogEntity);
-        dogEntity.setOwner(ownerEntity);
-        ownerEntity.setContactMediums(new ArrayList<>());
+        ownerEntity.addPet(petEntity);
         //Creation of valid ContactMedium
         ContactMedium contactMedium = new ContactMedium();
         contactMedium.setType("Facebook");
         contactMedium.setValue("www.facebook.com/John");
-        contactMedium.setOwner(ownerEntity);
-        ownerEntity.getContactMediums().add(contactMedium);
+        ownerEntity.addContactMedium(contactMedium);
         //ACT AND ASSERT PHASE
         //A modo de ejemplo, la siguiente es una forma también válida pero obsoleta de implementar el testing de excepciones.
         try {
-            dogRepository.save(dogEntity);
+            ownerRepository.save(ownerEntity);
             fail();
         } catch (ConstraintViolationException e) { //Exception arrojada debido a la violación de la restricción definida por @NotNull
             assertTrue(true);
@@ -99,19 +91,45 @@ public class DataIntegrityTests {
 
     /*
     @Test
-    @DisplayName("Save Dog - Photo constraint - Should fail")
+    @DisplayName("Save Pet - Photo constraint - Should fail")
+    */
+
+    /*
+    @Test
+    @DisplayName("Save Pet - Related to null Owner - Should fail")
+    public void savePet_relatedToNullOwner_shouldFail(final TestInfo testInfo) {
+    }
+
+    @Test
+    @DisplayName("Save Pet - Related to Owner but not related back - Should fail")
+    public void savePet_relatedToOwnerButNotRelatedBack_shouldFail() {
+    }
+
+    Estos tests no deberían implementarse, dado que, en primer lugar, estos casos nunca deberían darse. Si se presentan, estamos
+    ante un caso de fallo by design. Ambas responsabilidades, la de asignar un Owner a un Pet y el Pet a su Owner, deberían
+    ser implementadas por el mismo método.
     */
 
     @Test
-    @DisplayName("Save Dog - Related to null Owner - Should fail")
-    public void saveDog_relatedToNullOwner_shouldFail(final TestInfo testInfo) {
+    @DisplayName("Save Pet - Blank Owner name - Should fail")
+    public void savePet_blankOwnerName_shouldFail() {
         //ARRANGE PHASE
-        //Creation of invalid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
-        dogEntity.setDescription("");
+        //Creation of valid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("");
+        //Creation of invalid Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(23456789);
+        ownerEntity.setName("");
+        ownerEntity.addPet(petEntity);
+        //Creation of valid ContactMedium
+        ContactMedium contactMedium = new ContactMedium();
+        contactMedium.setType("Facebook");
+        contactMedium.setValue("www.facebook.com/John");
+        ownerEntity.addContactMedium(contactMedium);
         //ACT AND ASSERT PHASE
-        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> dogRepository.save(dogEntity));
+        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));
         /* --------------------------------------------------------------------------------------------------------------------------
         When a lambda expression uses an assigned local variable from its enclosing space there is an important restriction.
         A lambda expression may only use local variable whose value doesn't change.
@@ -121,168 +139,120 @@ public class DataIntegrityTests {
         ----------------------------------------------------------------------------------------------------------------------------*/
         System.out.println(e.toString());
     }
-    /*
-    @Test
-    @DisplayName("Save Dog - Related to Owner but not related back - Should fail")
-    public void saveDog_relatedToOwnerButNotRelatedBack_shouldFail() {
-    }
-
-    Este test no debería implementarse, dado que, en primer lugar, este caso nunca debería darse. Si se presenta, estamos
-    ante un caso de fallo by design. Ambas responsabilidades, la de asignar un Owner a un Dog y el Dog a su Owner, deberían
-    ser implementadas por el mismo método.
-    */
-
-    @Test
-    @DisplayName("Save Dog - Blank Owner name - Should fail")
-    public void saveDog_blankOwnerName_shouldFail() {
-        //ARRANGE PHASE
-        //Creation of valid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
-        dogEntity.setDescription("");
-        //Creation of invalid Owner
-        Owner ownerEntity = new Owner();
-        ownerEntity.setDni(23456789);
-        ownerEntity.setName("");
-        ownerEntity.setDogs(new ArrayList<>());
-        ownerEntity.setContactMediums(new ArrayList<>());
-        ownerEntity.getDogs().add(dogEntity);
-        dogEntity.setOwner(ownerEntity);
-        //Creation of valid ContactMedium
-        ContactMedium contactMedium = new ContactMedium();
-        contactMedium.setType("Facebook");
-        contactMedium.setValue("www.facebook.com/John");
-        contactMedium.setOwner(ownerEntity);
-        ownerEntity.getContactMediums().add(contactMedium);
-        //ACT AND ASSERT PHASE
-        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> dogRepository.save(dogEntity));
-        System.out.println(e.toString());
-    }
     
 //    @Test
-//    @DisplayName("Save Dog - invalid DNI - Should fail")
-//    public void saveDog_invalidDNI_shouldFail() {
+//    @DisplayName("Save Pet - invalid DNI - Should fail")
+//    public void savePet_invalidDNI_shouldFail() {
 //    }
 
+    //La siguiente situación no debería darse nunca, ya que por defecto inicializamos la variable contactMediums con un ArrayList vacío,
+    //pero dejamos el test for the sake of ilustratividad.
     @Test
-    @DisplayName("Save Dog - Null ContactMedium list - Should fail")
-    public void saveDog_nullContactMediumList_shouldFail() {
+    @DisplayName("Save Pet - Null ContactMedium list - Should fail")
+    public void savePet_nullContactMediumList_shouldFail() {
         //ARRANGE PHASE
-        //Creation of valid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
-        dogEntity.setDescription("");
+        //Creation of valid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("");
         //Creation of invalid Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setName("John");
         ownerEntity.setDni(23456789);
-        ownerEntity.setDogs(new ArrayList<>());
-        dogEntity.setOwner(ownerEntity);
-        ownerEntity.getDogs().add(dogEntity);
+        ownerEntity.addPet(petEntity);
+        //Forced null ContactMedium
+        ownerEntity.setContactMediums(null);
         //ACT AND ASSERT PHASE
-        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> dogRepository.save(dogEntity));
+        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));
         System.out.println(e.toString());
     }
 
+    //La restrición definida por la anotación @NotEmpty, además de validar que la lista no esté vacía, inicialmente valida que tampoco sea null
+    //(no puede estar vacía si no existe, duh). Por lo que el test anterior es doblemente innecesario :^)
     @Test
-    @DisplayName("Save Dog - Empty ContactMedium list - Should fail")
-    public void saveDog_emptyContactMediumList_shouldFail() {
+    @DisplayName("Save Pet - Empty ContactMedium list - Should fail")
+    public void savePet_emptyContactMediumList_shouldFail() {
         //ARRANGE PHASE
-        //Creation of valid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
-        dogEntity.setDescription("");
+        //Creation of valid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("");
         //Creation of invalid Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setName("John");
         ownerEntity.setDni(23456789);
-        ownerEntity.setDogs(new ArrayList<>());
-        ownerEntity.setContactMediums(new ArrayList<>());
-        dogEntity.setOwner(ownerEntity);
-        ownerEntity.getDogs().add(dogEntity);
+        ownerEntity.addPet(petEntity);
         //ACT AND ASSERT PHASE
-        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> dogRepository.save(dogEntity));
+        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));
         System.out.println(e.toString());
     }
 
     @Test
-    @DisplayName("Save Dog - Blank ContactMedium type - Should fail")
-    public void saveDog_blankContactMediumType_shouldFail() {
+    @DisplayName("Save Pet - Blank ContactMedium type - Should fail")
+    public void savePet_blankContactMediumType_shouldFail() {
         //ARRANGE PHASE
-        //Creation of valid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
-        dogEntity.setDescription("");
+        //Creation of valid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("");
         //Creation of valid Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setName("John");
         ownerEntity.setDni(23456789);
-        ownerEntity.setDogs(new ArrayList<>());
-        ownerEntity.setContactMediums(new ArrayList<>());
-        dogEntity.setOwner(ownerEntity);
-        ownerEntity.getDogs().add(dogEntity);
+        ownerEntity.addPet(petEntity);
         //Creation of invalid ContactMedium
         ContactMedium contactMedium = new ContactMedium();
         contactMedium.setType("");
         contactMedium.setValue("www.facebook.com/John");
-        contactMedium.setOwner(ownerEntity);
-        ownerEntity.getContactMediums().add(contactMedium);
+        ownerEntity.addContactMedium(contactMedium);
         //ACT AND ASSERT PHASE
-        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> dogRepository.save(dogEntity));
+        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));
         System.out.println(e.toString());
     }
 
     @Test
-    @DisplayName("Save Dog - Blank ContactMedium value - Should fail")
-    public void saveDog_blankContactMediumValue_shouldFail() {
+    @DisplayName("Save Pet - Blank ContactMedium value - Should fail")
+    public void savePet_blankContactMediumValue_shouldFail() {
         //ARRANGE PHASE
-        //Creation of valid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
-        dogEntity.setDescription("");
+        //Creation of valid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("");
         //Creation of valid Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setName("John");
         ownerEntity.setDni(23456789);
-        ownerEntity.setDogs(new ArrayList<>());
-        ownerEntity.setContactMediums(new ArrayList<>());
-        dogEntity.setOwner(ownerEntity);
-        ownerEntity.getDogs().add(dogEntity);
+        ownerEntity.addPet(petEntity);
         //Creation of invalid ContactMedium
         ContactMedium contactMedium = new ContactMedium();
         contactMedium.setType("Facebook");
         contactMedium.setValue("");
-        contactMedium.setOwner(ownerEntity);
-        ownerEntity.getContactMediums().add(contactMedium);
+        ownerEntity.addContactMedium(contactMedium);
         //ACT AND ASSERT PHASE
-        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> dogRepository.save(dogEntity));
+        ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));
         System.out.println(e.toString());
     }
 
     @Test
-    @DisplayName("Save Dog - Valid data - Should succeed")
-    public void saveDog_validData_shouldSucceed(final TestInfo testInfo) {
+    @DisplayName("Save Pet - Valid data - Should succeed")
+    public void savePet_validData_shouldSucceed(final TestInfo testInfo) {
         //ARRANGE PHASE
-        //Creation of valid Dog
-        Dog dogEntity = new Dog();
-        dogEntity.setName("Fluffy");
-        dogEntity.setDescription("Good boy");
+        //Creation of valid Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("Good boy");
         //Creation of valid Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setName("John");
         ownerEntity.setDni(23456789);
-        ownerEntity.setDogs(new ArrayList<>());
-        ownerEntity.getDogs().add(dogEntity);
-        dogEntity.setOwner(ownerEntity);
-        ownerEntity.setContactMediums(new ArrayList<>());
+        ownerEntity.addPet(petEntity);
         //Creation of valid ContactMedium
         ContactMedium contactMedium = new ContactMedium();
         contactMedium.setType("Facebook");
         contactMedium.setValue("www.facebook.com/John");
-        contactMedium.setOwner(ownerEntity);
-        ownerEntity.getContactMediums().add(contactMedium);
+        ownerEntity.addContactMedium(contactMedium);
         //ACT AND ASSERT PHASE
-        dogRepository.save(dogEntity);
-        assertDoesNotThrow(() -> dogRepository.save(dogEntity));
+        ownerRepository.save(ownerEntity);
+        assertDoesNotThrow(() -> ownerRepository.save(ownerEntity));
     }
 }

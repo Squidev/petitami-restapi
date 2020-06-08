@@ -3,6 +3,7 @@ package com.glamasw.petitamirestapi.entities;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 @Entity
 @Table(name = "contact_medium")
@@ -56,5 +57,20 @@ public class ContactMedium {
 
     public void setOwner(Owner owner) {
         this.owner = owner;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ContactMedium that = (ContactMedium) o;
+        return id == that.id &&
+                type.equals(that.type) &&
+                value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, value);
     }
 }

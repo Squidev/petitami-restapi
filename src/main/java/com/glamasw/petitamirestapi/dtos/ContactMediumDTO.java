@@ -6,7 +6,7 @@ package com.glamasw.petitamirestapi.dtos;
 public class ContactMediumDTO {
 
     private int id;
-    private String name;
+    private String type;
     private String value;
 
     public ContactMediumDTO(){
@@ -21,12 +21,12 @@ public class ContactMediumDTO {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getType() {
+        return type;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getValue() {

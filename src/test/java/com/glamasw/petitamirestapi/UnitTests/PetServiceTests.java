@@ -3,16 +3,10 @@ package com.glamasw.petitamirestapi.UnitTests;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.glamasw.petitamirestapi.dtos.ContactMediumDTO;
-import com.glamasw.petitamirestapi.dtos.DogDTO;
-import com.glamasw.petitamirestapi.entities.ContactMedium;
-import com.glamasw.petitamirestapi.entities.Dog;
-import com.glamasw.petitamirestapi.entities.Owner;
-import com.glamasw.petitamirestapi.services.DogService;
+import com.glamasw.petitamirestapi.dtos.PetDTO;
+import com.glamasw.petitamirestapi.services.PetService;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,28 +21,28 @@ import java.util.ArrayList;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Execution(ExecutionMode.CONCURRENT)
-public class DogServiceTests {
+public class PetServiceTests {
 
     @Autowired
-    DogService dogService;
+    PetService petService;
 
     @Test
-    @DisplayName("DogService save() method test: No contact mediums provided")
+    @DisplayName("PetService save() method test: No contact mediums provided")
     public void saveNoContactMediums() throws Exception {
         //Entities init
-        DogDTO dogDTO = new DogDTO();
+        PetDTO petDTO = new PetDTO();
         //Atributes setting
-        dogDTO.setDogName("Chocoperro");
-        dogDTO.setOwnerName("Cochoperro Owner");
-        dogDTO.setOwnerDNI(49784584);
-        dogDTO.setContactMediumDTOS(new ArrayList<>());
-        //Persist dogDTO
+        petDTO.setPetName("Chocoperro");
+        petDTO.setOwnerName("Cochoperro Owner");
+        petDTO.setOwnerDni(49784584);
+        petDTO.setContactMediumDTOs(new ArrayList<>());
+        //Persist petDTO
         try {
-            dogDTO = dogService.save(dogDTO);
+            petDTO = petService.save(petDTO);
         } catch (Exception e) {
             throw new Exception();
         }
-        assertTrue(dogDTO.getContactMediumDTOS().isEmpty());
+        assertTrue(petDTO.getContactMediumDTOs().isEmpty());
     }
 
 
