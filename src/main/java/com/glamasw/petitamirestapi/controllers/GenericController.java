@@ -1,22 +1,20 @@
 package com.glamasw.petitamirestapi.controllers;
 
-import com.glamasw.petitamirestapi.dtos.PetDTO;
-
 import org.springframework.http.ResponseEntity;
 
 /**
  * ObjectController
  */
 
-public interface GenericController {
+public interface GenericController<T> {
 
     ResponseEntity getAll();
 
     ResponseEntity getOne(int id);
 
-    ResponseEntity post(PetDTO petDTO);
+    ResponseEntity save(T tDto);
 
-    ResponseEntity put(PetDTO petDTO, int id);
+    ResponseEntity update(T tDTO, int id);
 
     ResponseEntity delete(int id);
 }

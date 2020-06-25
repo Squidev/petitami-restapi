@@ -1,16 +1,13 @@
 package com.glamasw.petitamirestapi.dtos;
 
-/**
- * ContactMediumDTO
- */
 public class ContactMediumDTO {
 
     private int id;
     private String type;
     private String value;
+    private int ownerId;
 
     public ContactMediumDTO(){
-
     }
 
     public int getId() {
@@ -37,5 +34,11 @@ public class ContactMediumDTO {
         this.value = value;
     }
 
-    
+    public int getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
+    }
 }

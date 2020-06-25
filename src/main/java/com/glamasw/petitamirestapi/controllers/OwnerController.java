@@ -1,45 +1,42 @@
 package com.glamasw.petitamirestapi.controllers;
 
-import com.glamasw.petitamirestapi.dtos.PetDTO;
-import com.glamasw.petitamirestapi.services.PetService;
+import com.glamasw.petitamirestapi.dtos.OwnerDTO;
+import com.glamasw.petitamirestapi.services.OwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/api/v1/pet")
-public class PetController implements GenericController<PetDTO> {
+@RequestMapping("/api/v1/owner")
+@CrossOrigin("*")
+public class OwnerController implements GenericController<OwnerDTO> {
 
     @Autowired
-    PetService petService;
+    OwnerService ownerService;
 
     @Override
-    @CrossOrigin("*")
-    @GetMapping(path = "/")
-    @Transactional
+    @GetMapping("/")
     public ResponseEntity getAll() {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body(petService.findAll());
+                                 .body(ownerService.findAll());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body("{\"message\":\"Error: Fallo interno en el servicio\"}");
+                                 .body("{\"message\":\"Error: Fallo interno en el servicio}");
         }
     }
 
     @Override
-    @GetMapping(path = "/{id}")
-    @Transactional
+    @GetMapping("/{id}")
     public ResponseEntity getOne(@PathVariable int id) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body(petService.findById(id));
+                                 .body(ownerService.findById(id));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .contentType(MediaType.APPLICATION_JSON)
@@ -47,43 +44,26 @@ public class PetController implements GenericController<PetDTO> {
         }
     }
 
-    @GetMapping(path = "/uuid/{uuid}")
-    @Transactional
-    public ResponseEntity getOneByUuid(@PathVariable String uuid) {
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity getOneByDni(@PathVariable int dni) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body(petService.findByUuid(uuid));
+                                 .body(ownerService.findByDni(dni));
         } catch (Exception e) {
-            System.out.println("El uuid ingresado no existe en la base de datos");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body("{\"message\":\"Error: El UUID ingresado no es válido\"}");
+                                 .body("{\"message\":\"Error: El DNI ingresado no es válido\"}");
         }
     }
 
     @Override
-    @PostMapping(path = "/")
-    @Transactional
-    public ResponseEntity save(@RequestBody PetDTO petDTO) {
+    @PostMapping("/")
+    public ResponseEntity save(@RequestBody OwnerDTO tDto) {
         try {
             return ResponseEntity.status(HttpStatus.OK)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body(petService.save(petDTO));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .body("{\"message\":\"Error: Controlar que los datos ingresados sean válidos e intentar luego nuevamente\"}");
-        }
-    }
-
-    @PutMapping(path = "/{id}")
-    @Transactional
-    public ResponseEntity update(@RequestBody PetDTO petDTO, @PathVariable int id) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK)
-                                 .contentType(MediaType.APPLICATION_JSON)
-                                 .body(petService.update(petDTO, id));
+                                 .body(ownerService.save(tDto));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .contentType(MediaType.APPLICATION_JSON)
@@ -92,16 +72,28 @@ public class PetController implements GenericController<PetDTO> {
     }
 
     @Override
-    @DeleteMapping(path = "/{id}")
-    @Transactional
+    @PutMapping("/{id}")
+    public ResponseEntity update(@RequestBody OwnerDTO tDTO, @PathVariable int id) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .body(ownerService.update(tDTO, id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .body("{\"message\":\"Error: Controlar que los datos ingresados sean válidos e intentar luego nuevamente\"}");
+        }
+    }
+
+    @Override
+    @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable int id) {
         try {
-            petService.delete(id);
+            ownerService.delete(id);
             return ResponseEntity.status(HttpStatus.OK)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .body("{\"message\":\"El registro ha sido eliminado con éxito\"}");
         } catch (Exception e) {
-            System.out.println("No existe el id que desea eliminar");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .contentType(MediaType.APPLICATION_JSON)
                                  .body("{\"message\":\"Error: Controlar que los datos ingresados sean válidos e intentar luego nuevamente\"}");

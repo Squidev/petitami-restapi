@@ -1,4 +1,4 @@
-package com.glamasw.petitamirestapi.IntegrationTests;
+package com.glamasw.petitamirestapi.IntegrationTests.RepositoryTests;
 
 import com.glamasw.petitamirestapi.entities.ContactMedium;
 import com.glamasw.petitamirestapi.entities.Owner;
@@ -12,18 +12,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,10 +36,13 @@ public class ContactMediumRepositoryTests {
     EntityManagerFactory entityManagerFactory;
     @Autowired
     ValidatorFactory validatorFactory;
-    static List<Owner> ownerEntitiesForDBPopulation = new ArrayList<>();
+    private List<Owner> ownerEntitiesForDBPopulation = new ArrayList<>();
+    @Autowired
+    TransactionTemplate transactionTemplate;
 
-    @BeforeAll
-    static void setOwnerEntitiesForDBPopulation() {
+    @BeforeEach
+    void setOwnerEntitiesForDBPopulation() {
+        ownerEntitiesForDBPopulation.clear();
         for (int i = 1; i <= 5; i++) {
             //Creation of Pet
             Pet petEntity = new Pet();
@@ -72,24 +74,30 @@ public class ContactMediumRepositoryTests {
     }
 
     @BeforeEach
-    void populateDB () {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        entityManager.getTransaction().begin();
-        for (Owner owner: ownerEntitiesForDBPopulation) {
-            entityManager.persist(owner);
-        }
-        entityManager.flush();
-        entityManager.getTransaction().commit();
-        entityManager.clear();
-        entityManager.close();
+    void dbCleanUp() {
+        ownerRepository.deleteAll();
+    }
+
+    void populateDB() {
+        ownerRepository.saveAll(ownerEntitiesForDBPopulation);
     }
 
     @Test
-    @DisplayName("Find all ContactMediums - Should succeed")
-    @Transactional
-    void findAllContactMediums_shouldSucceed(){
+    @DisplayName("Find all ContactMediums - Empty DB - Should return empty list of ContactMediums")
+    void findAllContactMediums_emptyDB_shouldReturnEmptyListOfContactMediums() {
+        //ARRANGE
+        //ACT
+        List<ContactMedium> foundContactMediums = contactMediumRepository.findAll();
+        //ASSERT
+        assertTrue(foundContactMediums.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Find all ContactMediums - Populated DB - Should return full list of ContactMediums")
+    void findAllContactMediums_populatedDB_shouldReturnFullListOfContactMediums(){
         //ARRANGE
         //Population of DB
+        populateDB();
         //Array of all persisted ContactMediums
         List<ContactMedium> persistedContactMediums = new ArrayList<>();
         for (Owner ownerEntity : ownerEntitiesForDBPopulation) {
@@ -97,16 +105,62 @@ public class ContactMediumRepositoryTests {
         }
         //ACT
         List<ContactMedium> foundContactMediums = contactMediumRepository.findAll();
+        System.out.println(foundContactMediums.size());
         //ASSERT
+        assertTrue(foundContactMediums.size() == persistedContactMediums.size());
         assertArrayEquals(foundContactMediums.toArray(), persistedContactMediums.toArray());
     }
 
     @Test
+    @DisplayName("Find ContactMedium - By id - Should succeed")
+    void findContactMedium_byId_shouldSucceed() {
+        //ARRANGE
+        //Population of DB
+        populateDB();
+        //Creation of Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(48419877);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("Good boy");
+        ownerEntity.addPet(petEntity);
+        //Creation of ContactMedium
+        ContactMedium contactMediumEntity = new ContactMedium();
+        contactMediumEntity.setType("Facebook");
+        contactMediumEntity.setValue("www.facebook.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity);
+        //Persistence of Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+        //ACT AND ASSERT
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                Optional<ContactMedium> optionalContactMedium = contactMediumRepository.findById(contactMediumEntity.getId());
+                ContactMedium foundContactMedium = optionalContactMedium.get();
+                //ASSERT
+                //ContactMedium data coincide
+                assertEquals(foundContactMedium, contactMediumEntity);
+                //Owner data coincide
+                assertEquals(foundContactMedium.getOwner(), ownerEntity);
+                //Pet data coincide
+                assertArrayEquals(foundContactMedium.getOwner().getPets().toArray(), ownerEntity.getPets().toArray());
+            }
+        });
+    }
+
+    @Test
     @DisplayName("Save ContactMedium - Existing Owner related to single Pet and single ContactMedium - Should succeed")
-    @Transactional
     void savePet_existingOwnerRelatedToSinglePetAndSingleContactMedium_shouldSucceed() {
         //ARRANGE
         //Population of DB
+        populateDB();
         //Creation of Owner
         Owner ownerEntity = new Owner();
         ownerEntity.setDni(48419877);
@@ -134,67 +188,39 @@ public class ContactMediumRepositoryTests {
         contactMediumToSave.setValue("www.instagram.com/FluffyOwner");
 
         //ACT
-        Optional<Owner> optionalOwner = ownerRepository.findById(ownerEntity.getId());
-        Owner foundOwner = optionalOwner.get();
-        contactMediumToSave.setOwner(foundOwner);
-        contactMediumRepository.save(contactMediumToSave);
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                Optional<Owner> optionalOwner = ownerRepository.findById(ownerEntity.getId());
+                Owner foundOwner = optionalOwner.get();
+                contactMediumToSave.setOwner(foundOwner);
+                contactMediumRepository.save(contactMediumToSave);
+            }
+        });
 
         //ASSERT
-        assertTrue(contactMediumToSave.getId() != 0);
-        assertTrue(contactMediumToSave.getOwner().getId() == ownerEntity.getId());
-        assertTrue(foundOwner.getContactMediums().size() ==2);
-        assertEquals(foundOwner.getContactMediums().get(1), contactMediumToSave);
-    }
-
-    @Test
-    @DisplayName("Find ContactMedium - By id - Should succeed")
-    @Transactional
-    void findContactMedium_byId_shouldSucceed() {
-        //ARRANGE
-        //Population of DB
-        //Creation of Owner
-        Owner ownerEntity = new Owner();
-        ownerEntity.setDni(48419877);
-        ownerEntity.setName("Fluffy Owner");
-        //Creation of Pet
-        Pet petEntity = new Pet();
-        petEntity.setName("Fluffy");
-        petEntity.setDescription("Good boy");
-        ownerEntity.addPet(petEntity);
-        //Creation of ContactMedium
-        ContactMedium contactMediumEntity = new ContactMedium();
-        contactMediumEntity.setType("Facebook");
-        contactMediumEntity.setValue("www.facebook.com/FluffyOwner");
-        ownerEntity.addContactMedium(contactMediumEntity);
-        //Persistence of Owner
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        entityManager.getTransaction().begin();
-        entityManager.persist(ownerEntity);
-        entityManager.getTransaction().commit();
-        entityManager.clear();
-        entityManager.close();
-        //ACT
-        Optional<ContactMedium> optionalContactMedium = contactMediumRepository.findById(contactMediumEntity.getId());
-        ContactMedium foundContactMedium = optionalContactMedium.get();
-        //ASSERT
-        //Pet data coincide
-        assertEquals(foundContactMedium, contactMediumEntity);
-        //Owner data coincide
-        assertEquals(foundContactMedium.getOwner(), ownerEntity);
-        //ContactMedium data coincide
-        assertArrayEquals(foundContactMedium.getOwner().getPets().toArray(), ownerEntity.getPets().toArray());
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                Optional<Owner> optionalOwner = ownerRepository.findById(ownerEntity.getId());
+                Owner foundOwner = optionalOwner.get();
+                assertTrue(contactMediumToSave.getId() != 0);
+                assertTrue(contactMediumToSave.getOwner().getId() == ownerEntity.getId());
+                assertTrue(foundOwner.getContactMediums().size() ==2);
+                assertEquals(foundOwner.getContactMediums().get(1), contactMediumToSave);
+            }
+        });
     }
 
     @Test
     @DisplayName("Delete ContactMedium - Existing Owner related to three Pets and three ContactMediums - Should succeed")
-    @Transactional
-    void deleteContactMedium_existingOwnerRelatedToThreePetsAndThreeContactmediums_shouldSucceed() {
+    void deleteContactMedium_existingOwnerRelatedToThreePetsAndThreeContactMediums_shouldSucceed() {
         //ARRANGE
         //Population of DB
-        //populateDB();
+        populateDB();
         //Creation of Owner
         Owner ownerEntity = new Owner();
-        ownerEntity.setName("Fluffy, Biggie and Squishy Owner");
+        ownerEntity.setName("Fluffy, Biggie and Fatty Owner");
         ownerEntity.setDni(48419877);
         //Creation of Pets
         Pet petEntity1 = new Pet();
@@ -208,19 +234,19 @@ public class ContactMediumRepositoryTests {
         ownerEntity.addPet(petEntity2);
 
         Pet petEntity3 = new Pet();
-        petEntity3.setName("Squishy");
+        petEntity3.setName("Fatty");
         petEntity3.setDescription("Rubenesque boy");
         ownerEntity.addPet(petEntity3);
 
         //Creation of ContactMediums
         ContactMedium contactMediumEntityToDelete = new ContactMedium();
         contactMediumEntityToDelete.setType("Facebook");
-        contactMediumEntityToDelete.setValue("www.facebook.com/FluffyAndBiggieAndSquishyOwner");
+        contactMediumEntityToDelete.setValue("www.facebook.com/FluffyAndBiggieAndFattyOwner");
         ownerEntity.addContactMedium(contactMediumEntityToDelete);
 
         ContactMedium contactMediumEntity2 = new ContactMedium();
         contactMediumEntity2.setType("Instagram");
-        contactMediumEntity2.setValue("www.instagram.com/FluffyAndBiggieAndSquishyOwner");
+        contactMediumEntity2.setValue("www.instagram.com/FluffyAndBiggieAndFattyOwner");
         ownerEntity.addContactMedium(contactMediumEntity2);
 
         ContactMedium contactMediumEntity3 = new ContactMedium();
@@ -237,21 +263,34 @@ public class ContactMediumRepositoryTests {
         entityManager.close();
 
         //ACT
-        Optional<ContactMedium> optionalContactMedium = contactMediumRepository.findById(contactMediumEntityToDelete.getId());
-        ContactMedium foundContactMedium = optionalContactMedium.get();
-        Owner owner = foundContactMedium.getOwner();
-        //Desasociación del ContactMedium
-        owner.removeContactMedium(foundContactMedium);
-        //Deleteo del ContactMedium
-        contactMediumRepository.delete(foundContactMedium);
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                Optional<ContactMedium> optionalContactMedium = contactMediumRepository.findById(contactMediumEntityToDelete.getId());
+                ContactMedium foundContactMedium = optionalContactMedium.get();
+                Owner owner = foundContactMedium.getOwner();
+                //Desasociación del ContactMedium
+                owner.removeContactMedium(foundContactMedium);
+                //Deleteo del ContactMedium
+                contactMediumRepository.delete(foundContactMedium);
+            }
+        });
 
         //ASSERT
-        //El Optional devuelto no incluye un ContactMedium existente
-        assertTrue(contactMediumRepository.findById(contactMediumEntityToDelete.getId()).isEmpty());
-        //Las cantidad total de ContactMediums asociados al Owner es de 2
-        assertTrue(ownerRepository.findById(owner.getId()).get().getContactMediums().size() == 2);
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                //El Optional devuelto no incluye un ContactMedium existente
+                assertTrue(contactMediumRepository.findById(contactMediumEntityToDelete.getId()).isEmpty());
+                //Las cantidad total de ContactMediums asociados al Owner es de 2
+                assertTrue(ownerRepository.findById(ownerEntity.getId()).get().getContactMediums().size() == 2);
+            }
+        });
+
     }
 
+    /*El siguiente test era necesario inicialmente cuando consideramos la restricción de que un Owner no podía tener una lista de ContactMediums vacía. Queda acá
+    porque es relevante tener en cuenta la situación que se dió con respecto a la validación.
     @Test
     @DisplayName("Delete ContactMedium - Existing Owner related to single Pet and single ContactMedium - Should fail")
     @Transactional
@@ -304,5 +343,5 @@ public class ContactMediumRepositoryTests {
                     ownerRepository.flush();
                 }
         );
-    }
+    }*/
 }

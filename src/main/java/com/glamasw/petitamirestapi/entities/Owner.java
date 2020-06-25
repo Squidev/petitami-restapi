@@ -21,10 +21,13 @@ public class Owner {
     @Min(value = 1, message = "El DNI debe ser un valor positivo")
     @Column(name = "dni", unique = true)
     private int dni;
-    @NotEmpty(message = "La lista de mascotas no puede estar vacía") //La anotación NotEmpty incluye también la validación de que la colección no tenga asociado un valor null.
+    //@NotEmpty(message = "La lista de mascotas no puede estar vacía") //La anotación NotEmpty incluye también la validación de que la colección no tenga asociado un
+    // valor null.
+    @NotNull
     @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Pet> pets = new ArrayList<>();
-    @NotEmpty(message = "La lista de medios de contacto no puede estar vacía")
+    //@NotEmpty(message = "La lista de medios de contacto no puede estar vacía")
+    @NotNull
     @OneToMany(mappedBy = "owner", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<ContactMedium> contactMediums = new ArrayList<>();
 

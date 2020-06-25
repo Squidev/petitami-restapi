@@ -26,24 +26,7 @@ public class PetServiceTests {
     @Autowired
     PetService petService;
 
-    @Test
-    @DisplayName("PetService save() method test: No contact mediums provided")
-    public void saveNoContactMediums() throws Exception {
-        //Entities init
-        PetDTO petDTO = new PetDTO();
-        //Atributes setting
-        petDTO.setPetName("Chocoperro");
-        petDTO.setOwnerName("Cochoperro Owner");
-        petDTO.setOwnerDni(49784584);
-        petDTO.setContactMediumDTOs(new ArrayList<>());
-        //Persist petDTO
-        try {
-            petDTO = petService.save(petDTO);
-        } catch (Exception e) {
-            throw new Exception();
-        }
-        assertTrue(petDTO.getContactMediumDTOs().isEmpty());
-    }
+
 
 
 }

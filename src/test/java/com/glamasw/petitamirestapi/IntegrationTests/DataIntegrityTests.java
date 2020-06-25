@@ -9,9 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
+import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,6 +36,7 @@ public class DataIntegrityTests {
 
     @Test
     @DisplayName("Save Pet - Blank name - Should fail")
+    @Transactional
     public void savePet_blankName_shouldFail(final TestInfo testInfo) {
         //ARRANGE PHASE
         //Creation of invalid Pet
@@ -63,6 +63,7 @@ public class DataIntegrityTests {
 
     @Test
     @DisplayName("Save Pet - Null description - Should fail")
+    @Transactional
     public void savePet_nullDescription_shouldFail(final TestInfo testInfo) {
         //ARRANGE PHASE
         //Creation of invalid Pet
@@ -112,6 +113,7 @@ public class DataIntegrityTests {
 
     @Test
     @DisplayName("Save Pet - Blank Owner name - Should fail")
+    @Transactional
     public void savePet_blankOwnerName_shouldFail() {
         //ARRANGE PHASE
         //Creation of valid Pet
@@ -149,6 +151,7 @@ public class DataIntegrityTests {
     //pero dejamos el test for the sake of ilustratividad.
     @Test
     @DisplayName("Save Pet - Null ContactMedium list - Should fail")
+    @Transactional
     public void savePet_nullContactMediumList_shouldFail() {
         //ARRANGE PHASE
         //Creation of valid Pet
@@ -166,11 +169,12 @@ public class DataIntegrityTests {
         ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));
         System.out.println(e.toString());
     }
-
+/*
     //La restrición definida por la anotación @NotEmpty, además de validar que la lista no esté vacía, inicialmente valida que tampoco sea null
     //(no puede estar vacía si no existe, duh). Por lo que el test anterior es doblemente innecesario :^)
     @Test
     @DisplayName("Save Pet - Empty ContactMedium list - Should fail")
+    @Transactional
     public void savePet_emptyContactMediumList_shouldFail() {
         //ARRANGE PHASE
         //Creation of valid Pet
@@ -185,10 +189,11 @@ public class DataIntegrityTests {
         //ACT AND ASSERT PHASE
         ConstraintViolationException e = assertThrows(ConstraintViolationException.class, () -> ownerRepository.save(ownerEntity));
         System.out.println(e.toString());
-    }
+    }*/
 
     @Test
     @DisplayName("Save Pet - Blank ContactMedium type - Should fail")
+    @Transactional
     public void savePet_blankContactMediumType_shouldFail() {
         //ARRANGE PHASE
         //Creation of valid Pet
@@ -212,6 +217,7 @@ public class DataIntegrityTests {
 
     @Test
     @DisplayName("Save Pet - Blank ContactMedium value - Should fail")
+    @Transactional
     public void savePet_blankContactMediumValue_shouldFail() {
         //ARRANGE PHASE
         //Creation of valid Pet
@@ -235,6 +241,7 @@ public class DataIntegrityTests {
 
     @Test
     @DisplayName("Save Pet - Valid data - Should succeed")
+    @Transactional
     public void savePet_validData_shouldSucceed(final TestInfo testInfo) {
         //ARRANGE PHASE
         //Creation of valid Pet

@@ -1,64 +1,58 @@
 package com.glamasw.petitamirestapi.dtos;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class PetDTO {
 
-    private int petId;
-    private String petUuid;
-    private String petName;
-    private byte[] petPhoto;
-    private String petDescription;
+    private int id;
+    private String uuid;
+    private String name;
+    private byte[] photo;
+    private String description;
     private int ownerId;
-    private int ownerDni;
-    private String ownerName;
-    private List<ContactMediumDTO> contactMediumDTOs = new ArrayList<>();
 
     public PetDTO() {
-
     }
 
     //GETTERS AND SETTERS
-    public int getPetId() {
-        return petId;
+
+
+    public int getId() {
+        return id;
     }
 
-    public void setPetId(int petId) {
-        this.petId = petId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getPetUuid() {
-        return petUuid;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setPetUuid(String petUuid) {
-        this.petUuid = petUuid;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
-    public String getPetName() {
-        return petName;
+    public String getName() {
+        return name;
     }
 
-    public void setPetName(String petName) {
-        this.petName = petName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public byte[] getPetPhoto() {
-        return petPhoto;
+    public byte[] getPhoto() {
+        return photo;
     }
 
-    public void setPetPhoto(byte[] petPhoto) {
-        this.petPhoto = petPhoto;
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 
-    public String getPetDescription() {
-        return petDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setPetDescription(String petDescription) {
-        this.petDescription = petDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getOwnerId() {
@@ -67,38 +61,5 @@ public class PetDTO {
 
     public void setOwnerId(int ownerId) {
         this.ownerId = ownerId;
-    }
-
-    public String getOwnerName() {
-        return ownerName;
-    }
-
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
-    }
-
-    public int getOwnerDni() {
-        return ownerDni;
-    }
-
-    public void setOwnerDni(int ownerDni) {
-        this.ownerDni = ownerDni;
-    }
-
-    public List<ContactMediumDTO> getContactMediumDTOs() {
-        return contactMediumDTOs;
-    }
-
-    public void setContactMediumDTOs(List<ContactMediumDTO> contactMediumDTOs) {
-        this.contactMediumDTOs = contactMediumDTOs;
-    }
-
-    //METHODS
-    public void addContactMediumDTO(ContactMediumDTO contactMediumDTO) {
-        contactMediumDTOs.add(contactMediumDTO);
-    }
-
-    public void deleteContactMediumDTO(ContactMediumDTO contactMediumDTO) {
-        contactMediumDTOs.remove(contactMediumDTO);
     }
 }
