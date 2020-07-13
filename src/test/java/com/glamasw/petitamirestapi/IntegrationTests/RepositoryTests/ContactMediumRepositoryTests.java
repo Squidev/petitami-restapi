@@ -156,6 +156,84 @@ public class ContactMediumRepositoryTests {
     }
 
     @Test
+    @DisplayName("Find ContactMedium By Owner Id - Existing Owner related to single Pet and no ContactMedium - Should return empty list of ContactMediums")
+    void findContactMediumByOwnerId_ExistingOwnerRelatedToSinglePetAndNoContactMedium_ShouldReturnEmptyListOfContactMediums() {
+        //Population of DB
+        populateDB();
+        //Creation of Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(48419877);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("Good boy");
+        ownerEntity.addPet(petEntity);
+        //Persistence of Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+
+        //ASERTS
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                List<ContactMedium> foundContactMediums = contactMediumRepository.findByOwnerId(ownerEntity.getId());
+                assertTrue(foundContactMediums.isEmpty());
+            }
+        });
+    }
+
+    @Test
+    @DisplayName("Find ContactMedium By Owner Id - Existing Owner related to single Pet and 3 ContactMedium - Should succeed")
+    void findContactMediumByOwnerId_ExistingOwneRelatedToSinglePetAnd3ContactMedium_shouldSucceed() {
+        //Population of DB
+        populateDB();
+        //Creation of Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(48419877);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("Good boy");
+        ownerEntity.addPet(petEntity);
+        //Creation of ContactMedium
+        ContactMedium contactMediumEntity = new ContactMedium();
+        contactMediumEntity.setType("Facebook");
+        contactMediumEntity.setValue("www.facebook.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity);
+        ContactMedium contactMediumEntity1 = new ContactMedium();
+        contactMediumEntity1.setType("Instagram");
+        contactMediumEntity1.setValue("www.Instagram.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity1);
+        ContactMedium contactMediumEntity2 = new ContactMedium();
+        contactMediumEntity2.setType("Tinder");
+        contactMediumEntity2.setValue("www.Tinder.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity2);
+        //Persistence of Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+
+        //ASERTS
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                List<ContactMedium> foundContactMediums = contactMediumRepository.findByOwnerId(ownerEntity.getId());
+                assertTrue(foundContactMediums.size() == ownerEntity.getContactMediums().size());
+                assertArrayEquals(foundContactMediums.toArray(), ownerEntity.getContactMediums().toArray());
+            }
+        });
+    }
+
+    @Test
     @DisplayName("Save ContactMedium - Existing Owner related to single Pet and single ContactMedium - Should succeed")
     void savePet_existingOwnerRelatedToSinglePetAndSingleContactMedium_shouldSucceed() {
         //ARRANGE

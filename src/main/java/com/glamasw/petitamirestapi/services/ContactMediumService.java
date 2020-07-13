@@ -60,6 +60,25 @@ public class ContactMediumService implements GenericService<ContactMediumDTO>{
         return contactMediumDTO;
     }
 
+    @Transactional
+    public List<ContactMediumDTO> findByOwnerId(int id) throws Exception {
+        List<ContactMediumDTO> contactMediumDTOS = new ArrayList<>();
+        try {
+            List<ContactMedium> contactMediums = contactMediumRepository.findAll();
+            for (ContactMedium contactMediumEntity : contactMediums) {
+                ContactMediumDTO contactMediumDTO = new ContactMediumDTO();
+                contactMediumDTO.setId(contactMediumEntity.getId());
+                contactMediumDTO.setType(contactMediumEntity.getType());
+                contactMediumDTO.setValue(contactMediumEntity.getValue());
+                contactMediumDTO.setOwnerId(contactMediumEntity.getOwner().getId());
+                contactMediumDTOS.add(contactMediumDTO);
+            }
+        } catch (Exception e) {
+            throw new Exception();
+        }
+        return contactMediumDTOS;
+    }
+
     @Override
     @Transactional
     public ContactMediumDTO save(ContactMediumDTO contactMediumDTO) throws Exception {

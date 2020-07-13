@@ -263,6 +263,84 @@ public class PetRepositoryTests {
         });
     }
 
+    @Test
+    @DisplayName("Find Pets By Owner Id - Existing Owner related to no Pet and single ContactMedium - Should return empty list of Pets")
+    void findPetsByOwnerId_ExistingOwnerRelatedToNoPetAndSingleContactMedium_ShouldReturnEmptyListOfPets() {
+        //Population of DB
+        populateDB();
+        //Creation of Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(48419877);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of ContactMedium
+        ContactMedium contactMediumEntity = new ContactMedium();
+        contactMediumEntity.setType("Facebook");
+        contactMediumEntity.setValue("www.facebook.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity);
+        //Persistence of Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+
+        //ASERTS
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                List<Pet> foundPets = petRepository.findByOwnerId(ownerEntity.getId());
+                assertTrue(foundPets.isEmpty());
+            }
+        });
+    }
+
+    @Test
+    @DisplayName("Find ContactMedium By Owner Id - Existing Owner related to 3 Pet and single ContactMedium - Should succeed")
+    void findContactMediumByOwnerId_ExistingOwnerRelatedTo3PetAndSingleContactMedium_shouldSucceed() {
+        //Population of DB
+        populateDB();
+        //Creation of Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(48419877);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("Good boy");
+        ownerEntity.addPet(petEntity);
+        Pet petEntity2 = new Pet();
+        petEntity2.setName("Fluffy");
+        petEntity2.setDescription("Bad boy");
+        ownerEntity.addPet(petEntity2);
+        Pet petEntity3 = new Pet();
+        petEntity3.setName("Fluffy");
+        petEntity3.setDescription("Furry boy");
+        ownerEntity.addPet(petEntity3);
+        //Creation of ContactMedium
+        ContactMedium contactMediumEntity = new ContactMedium();
+        contactMediumEntity.setType("Facebook");
+        contactMediumEntity.setValue("www.facebook.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity);
+        //Persistence of Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+
+        //ASERTS
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                List<Pet> foundPets = petRepository.findByOwnerId(ownerEntity.getId());
+                assertTrue(foundPets.size() == ownerEntity.getPets().size());
+                assertArrayEquals(foundPets.toArray(), ownerEntity.getPets().toArray());
+            }
+        });
+    }
+
     // El siguiente test se efectúa mediante 3 transacciones diferentes para asegurarnos de que cada etapa es independiente del resto y estamos trabajando con datos
     // actually persistidos en la DB.
     @Test

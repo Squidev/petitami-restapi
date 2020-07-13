@@ -80,6 +80,27 @@ public class PetService implements GenericService<PetDTO> {
         return petDTO;
     }
 
+    @Transactional
+    public List<PetDTO> findByOwnerId(int id) throws Exception {
+        List<PetDTO> petDTOs = new ArrayList<>();
+        try {
+            List<Pet> petEntities = petRepository.findAll();
+            for (Pet petEntity : petEntities) {
+                PetDTO petDTO = new PetDTO();
+                petDTO.setId(petEntity.getId());
+                petDTO.setUuid(petEntity.getUuid());
+                petDTO.setName(petEntity.getName());
+                petDTO.setPhoto(petEntity.getPhoto());
+                petDTO.setDescription(petEntity.getDescription());
+                petDTO.setOwnerId(petEntity.getOwner().getId());
+                petDTOs.add(petDTO);
+            }
+        } catch (Exception e) {
+            throw new Exception();
+        }
+        return petDTOs;
+    }
+
     @Override
     @Transactional
     public PetDTO save(PetDTO petDTO) throws Exception {

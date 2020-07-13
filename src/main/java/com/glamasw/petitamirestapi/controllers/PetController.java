@@ -62,6 +62,21 @@ public class PetController implements GenericController<PetDTO> {
         }
     }
 
+    @GetMapping(path = "/owner/{id}")
+    @Transactional
+    public ResponseEntity getByOwnerId(@PathVariable int id) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .body(petService.findByOwnerId(id));
+        } catch (Exception e) {
+            System.out.println("El id ingresado no existe en la base de datos");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .body("{\"message\":\"Error: El ID ingresado no es válido\"}");
+        }
+    }
+
     @Override
     @PostMapping(path = "/")
     @Transactional
