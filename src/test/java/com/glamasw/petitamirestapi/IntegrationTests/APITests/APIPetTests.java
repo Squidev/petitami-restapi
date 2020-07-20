@@ -5,6 +5,7 @@ import com.glamasw.petitamirestapi.entities.Owner;
 import com.glamasw.petitamirestapi.entities.Pet;
 import com.glamasw.petitamirestapi.repositories.OwnerRepository;
 import com.glamasw.petitamirestapi.repositories.PetRepository;
+import com.sun.nio.sctp.HandlerResult;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -254,6 +255,117 @@ public class APIPetTests {
                               .andExpect(content().json(petEntityToJsonString(petEntity)))
                               .andDo(MockMvcResultHandlers.print())
                               .andReturn();
+    }
+
+    @Test
+    @DisplayName("Get pets by owner id - Existing Owner related to no Pet and single ContactMedium - Should return empty list of Pets")
+    public void getPetsByOwnerId_existingOwnerRelatedToNoPetAndSingleContactMedium_shouldReturnEmptyListOfPets() throws Exception {
+        //ARRANGE
+        populateDB();
+        //Creation of existing Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(54484154);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of existing ContactMedium
+        ContactMedium contactMediumEntity = new ContactMedium();
+        contactMediumEntity.setType("Facebook");
+        contactMediumEntity.setValue("www.facebook.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity);
+        //Persistence of existing Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+
+        //ACT AND ASSERT
+        MvcResult result = mockMvc.perform(get("/api/v1/pet/owner/" + ownerEntity.getId())
+                                          .contentType(MediaType.APPLICATION_JSON)
+                                          .content(""))
+                                  .andExpect(status().isOk())
+                                  .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                  .andExpect(content().json("[]"))
+                                  .andDo(MockMvcResultHandlers.print())
+                                  .andReturn();
+    }
+
+    @Test
+    @DisplayName("Get pets by owner id - Existing Owner related to three Pet and single ContactMedium - Should return list of existing three Pets")
+    public void getPetsByOwnerId_existingOwnerRelatedToThreePetAndSingleContactMedium_shouldReturnListOfExistingThreePets() throws Exception {
+        //ARRANGE
+        populateDB();
+        //Creation of existing Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(54484154);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of three existing Pet
+        Pet petEntity1 = new Pet();
+        petEntity1.setName("Fluffy");
+        petEntity1.setDescription("Good boy");
+        ownerEntity.addPet(petEntity1);
+
+        Pet petEntity2 = new Pet();
+        petEntity2.setName("Biggie");
+        petEntity2.setDescription("Bad boy");
+        ownerEntity.addPet(petEntity2);
+
+        Pet petEntity3 = new Pet();
+        petEntity3.setName("Fatty");
+        petEntity3.setDescription("Rubenesque boy");
+        ownerEntity.addPet(petEntity3);
+        //Creation of existing ContactMedium
+        ContactMedium contactMediumEntity = new ContactMedium();
+        contactMediumEntity.setType("Facebook");
+        contactMediumEntity.setValue("www.facebook.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity);
+        //Persistence of existing Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+        //JSON payload
+        String jsonPayloadOfPets = "[";
+        List<Pet> pets = ownerEntity.getPets();
+        for (Pet petEntity: pets) {
+            jsonPayloadOfPets += petEntityToJsonString(petEntity);
+            //Si se trata de la última Pet no se agrega la coma
+            if (pets.indexOf(petEntity) == pets.size() - 1) {
+                break;
+            }
+            jsonPayloadOfPets += ",";
+        }
+        jsonPayloadOfPets += "]";
+        //Comprobación visual
+        System.out.println(jsonPayloadOfPets);
+
+        //ACT AND ASSERT
+        MvcResult result = mockMvc.perform(get("/api/v1/pet/owner/" + ownerEntity.getId())
+                                          .contentType(MediaType.APPLICATION_JSON)
+                                          .content(""))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(content().json(jsonPayloadOfPets))
+                                .andDo(MockMvcResultHandlers.print())
+                                .andReturn();
+    }
+
+    @Test
+    @DisplayName("Get pets by owner id - Non existing Owner - Should return BAD_REQUEST error")
+    public void getPetsByOwnerId_nonExistingOwner_shouldReturnBadRequestError() throws Exception {
+        //ARRANGE
+        populateDB();
+        //ACT AND ASSERT
+        MvcResult result = mockMvc.perform(get("/api/v1/pet/owner/0")
+                                          .contentType(MediaType.APPLICATION_JSON)
+                                          .content(""))
+                                  .andExpect(status().isBadRequest())
+                                  .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                  .andExpect(content().json("{\"message\":\"Error: Controlar que los datos ingresados sean válidos e intentar luego nuevamente\"}"))
+                                  .andDo(MockMvcResultHandlers.print())
+                                  .andReturn();
     }
 
     /*---------------------------------------------------------------------------------------------------------------------------*/

@@ -64,8 +64,9 @@ public class ContactMediumService implements GenericService<ContactMediumDTO>{
     public List<ContactMediumDTO> findByOwnerId(int id) throws Exception {
         List<ContactMediumDTO> contactMediumDTOS = new ArrayList<>();
         try {
-            List<ContactMedium> contactMediums = contactMediumRepository.findAll();
-            for (ContactMedium contactMediumEntity : contactMediums) {
+            Optional<Owner> optionalOwner = ownerRepository.findById(id);
+            Owner ownerEntity = optionalOwner.get();
+            for (ContactMedium contactMediumEntity : ownerEntity.getContactMediums()) {
                 ContactMediumDTO contactMediumDTO = new ContactMediumDTO();
                 contactMediumDTO.setId(contactMediumEntity.getId());
                 contactMediumDTO.setType(contactMediumEntity.getType());

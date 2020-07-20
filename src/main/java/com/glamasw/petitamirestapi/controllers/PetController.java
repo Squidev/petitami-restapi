@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api/v1/pet")
+@CrossOrigin("*")
 public class PetController implements GenericController<PetDTO> {
 
     @Autowired
     PetService petService;
 
     @Override
-    @CrossOrigin("*")
     @GetMapping(path = "/")
     @Transactional
     public ResponseEntity getAll() {
@@ -73,7 +73,7 @@ public class PetController implements GenericController<PetDTO> {
             System.out.println("El id ingresado no existe en la base de datos");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body("{\"message\":\"Error: El ID ingresado no es válido\"}");
+                                 .body("{\"message\":\"Error: Controlar que los datos ingresados sean válidos e intentar luego nuevamente\"}");
         }
     }
 

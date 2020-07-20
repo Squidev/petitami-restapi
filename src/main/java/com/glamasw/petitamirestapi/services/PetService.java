@@ -84,8 +84,9 @@ public class PetService implements GenericService<PetDTO> {
     public List<PetDTO> findByOwnerId(int id) throws Exception {
         List<PetDTO> petDTOs = new ArrayList<>();
         try {
-            List<Pet> petEntities = petRepository.findAll();
-            for (Pet petEntity : petEntities) {
+            Optional<Owner> optionalOwner = ownerRepository.findById(id);
+            Owner ownerEntity = optionalOwner.get();
+            for (Pet petEntity : ownerEntity.getPets()) {
                 PetDTO petDTO = new PetDTO();
                 petDTO.setId(petEntity.getId());
                 petDTO.setUuid(petEntity.getUuid());

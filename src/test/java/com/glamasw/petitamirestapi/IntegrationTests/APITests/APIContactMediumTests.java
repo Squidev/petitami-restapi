@@ -197,6 +197,117 @@ public class APIContactMediumTests {
                 .andReturn();
     }
 
+    @Test
+    @DisplayName("Get contact mediums by owner id - Existing Owner related to no ContactMedium and single Pet - Should return empty list of ContactMedium")
+    public void getContactMediumsByOwnerId_existingOwnerRelatedToNoContactMediumAndSinglePet_shouldReturnEmptyListOfContactMedium() throws Exception {
+        //ARRANGE
+        populateDB();
+        //Creation of existing Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(54484154);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of existing Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("Good boy");
+        ownerEntity.addPet(petEntity);
+        //Persistence of existing Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+
+        //ACT AND ASSERT
+        MvcResult result = mockMvc.perform(get("/api/v1/contactmedium/owner/" + ownerEntity.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("[]"))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("Get contact mediums by owner id - Existing Owner related to three ContactMedium and single Pet - Should return list of existing three ContactMedium")
+    public void getContactMediumsByOwnerId_existingOwnerRelatedToThreeContactMediumAndSinglePet_shouldReturnListOfExistingThreeContactMedium() throws Exception {
+        //ARRANGE
+        populateDB();
+        //Creation of existing Owner
+        Owner ownerEntity = new Owner();
+        ownerEntity.setDni(54484154);
+        ownerEntity.setName("Fluffy Owner");
+        //Creation of existing Pet
+        Pet petEntity = new Pet();
+        petEntity.setName("Fluffy");
+        petEntity.setDescription("Good boy");
+        ownerEntity.addPet(petEntity);
+        //Creation of three existing ContactMedium
+        ContactMedium contactMediumEntity1 = new ContactMedium();
+        contactMediumEntity1.setType("Facebook");
+        contactMediumEntity1.setValue("www.facebook.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity1);
+
+        ContactMedium contactMediumEntity2 = new ContactMedium();
+        contactMediumEntity2.setType("Instagram");
+        contactMediumEntity2.setValue("www.instagram.com/FluffyOwner");
+        ownerEntity.addContactMedium(contactMediumEntity2);
+
+        ContactMedium contactMediumEntity3 = new ContactMedium();
+        contactMediumEntity3.setType("Tel");
+        contactMediumEntity3.setValue("0261854862");
+        ownerEntity.addContactMedium(contactMediumEntity3);
+        //Persistence of existing Owner
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(ownerEntity);
+        entityManager.getTransaction().commit();
+        entityManager.clear();
+        entityManager.close();
+        //JSON payload
+        String jsonPayloadOfContactMediums = "[";
+        List<ContactMedium> contactMediums = ownerEntity.getContactMediums();
+        for (ContactMedium contactMediumEntity: contactMediums) {
+            jsonPayloadOfContactMediums += contactMediumEntityToJsonString(contactMediumEntity);
+            //Si se trata de la última Pet no se agrega la coma
+            if (contactMediums.indexOf(contactMediumEntity) == contactMediums.size() - 1) {
+                break;
+            }
+            jsonPayloadOfContactMediums += ",";
+        }
+        jsonPayloadOfContactMediums += "]";
+        //Comprobación visual
+        System.out.println(jsonPayloadOfContactMediums);
+
+        //ACT AND ASSERT
+        MvcResult result = mockMvc.perform(get("/api/v1/contactmedium/owner/" + ownerEntity.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(jsonPayloadOfContactMediums))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("Get contact mediums by owner id - Non existing Owner - Should return BAD_REQUEST error")
+    public void getContactMediumsByOwnerId_nonExistingOwner_shouldReturnBadRequestError() throws Exception {
+        //ARRANGE
+        populateDB();
+        //ACT AND ASSERT
+        MvcResult result = mockMvc.perform(get("/api/v1/contactmedium/owner/0")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json("{\"message\":\"Error: Controlar que los datos ingresados sean válidos e intentar luego nuevamente\"}"))
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+    }
+
     /*---------------------------------------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------------------------------------------------------------------------------*/
     /*---------------------------------------------------POST REQUEST------------------------------------------------------------*/

@@ -19,8 +19,6 @@ public class ContactMediumController implements GenericController<ContactMediumD
     @Autowired
     ContactMediumService contactMediumService;
 
-
-
     @Override
     @GetMapping("/")
     @Transactional
@@ -57,7 +55,7 @@ public class ContactMediumController implements GenericController<ContactMediumD
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                  .contentType(MediaType.APPLICATION_JSON)
-                                 .body("{\"message\":\"Error: Revise el Id ingresado\"}");
+                                 .body("{\"message\":\"Error: Controlar que los datos ingresados sean válidos e intentar luego nuevamente\"}");
         }
     }
 
