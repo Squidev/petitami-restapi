@@ -5,7 +5,7 @@ public class PetDTO {
     private int id;
     private String uuid;
     private String name;
-    private byte[] photo;
+    private String photo;
     private String description;
     private int ownerId;
 
@@ -13,8 +13,6 @@ public class PetDTO {
     }
 
     //GETTERS AND SETTERS
-
-
     public int getId() {
         return id;
     }
@@ -39,11 +37,11 @@ public class PetDTO {
         this.name = name;
     }
 
-    public byte[] getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(byte[] photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 

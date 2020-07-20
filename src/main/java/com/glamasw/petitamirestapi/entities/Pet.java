@@ -25,9 +25,8 @@ public class Pet {
     @NotNull(message = "La descripción de la mascota debe apuntar a una String válida")
     @Column(name = "description")
     private String description;
-    @Lob
     @Column(name = "photo")
-    private byte[] photo = null;
+    private String photo = null;
     @ManyToOne
     @JoinColumn(name = "fk_owner", nullable = false)    //If null, throws DataIntegrityViolationException, with a nested ConstraintViolationException
     @NotNull(message = "La mascota debe estar relacionada con algún dueño") //If null, throws ConstraintViolationException
@@ -90,11 +89,11 @@ public class Pet {
         this.description = description;
     }
 
-    public byte[] getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
-    public void setPhoto(byte[] photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 
@@ -150,13 +149,11 @@ public class Pet {
                 uuid.compareTo(pet.getUuid()) == 0 &&
                 name.compareTo(pet.getName()) == 0 &&
                 description.compareTo(pet.getDescription()) == 0 &&
-                Arrays.equals(photo, pet.getPhoto());
+                photo.compareTo(pet.getPhoto()) == 0;
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, uuid, name, description);
-        result = 31 * result + Arrays.hashCode(photo);
-        return result;
+        return Objects.hash(id, uuid, name, description, photo);
     }
 }
