@@ -25,8 +25,9 @@ public class Pet {
     @NotNull(message = "La descripción de la mascota debe apuntar a una String válida")
     @Column(name = "description")
     private String description;
-    @Column(name = "photo")
-    private String photo = null;
+    @NotNull
+    @Column(name = "photo", columnDefinition = "MEDIUMTEXT")
+    private String photo = "";
     @ManyToOne
     @JoinColumn(name = "fk_owner", nullable = false)    //If null, throws DataIntegrityViolationException, with a nested ConstraintViolationException
     @NotNull(message = "La mascota debe estar relacionada con algún dueño") //If null, throws ConstraintViolationException

@@ -431,7 +431,7 @@ public class APIPetTests {
         String jsonPayloadOfPet =  "{\"id\":0," +
                                     "\"uuid\":null," +
                                     "\"name\":\"Fluffy\"," +
-                                    "\"photo\":null," +
+                                    "\"photo\":\"\"," +
                                     "\"description\":\"Good boy\"," +
                                     "\"ownerId\":" + ownerEntity.getId() + "}";
         //Next Pet id after DB population and existing Owner persistence
@@ -451,7 +451,7 @@ public class APIPetTests {
                               .andExpect(jsonPath("$.id").value(nextPetId))
                               .andExpect(jsonPath("$.uuid").isString())
                               .andExpect(jsonPath("$.name").value("Fluffy"))
-                              .andExpect(jsonPath("$.photo").isEmpty())
+                              .andExpect(jsonPath("$.photo").value(""))
                               .andExpect(jsonPath("$.description").value("Good boy"))
                               .andExpect(jsonPath("$.ownerId").value(ownerEntity.getId()))
                               .andDo(MockMvcResultHandlers.print())
@@ -494,7 +494,7 @@ public class APIPetTests {
         String jsonPayloadOfPet =  "{\"id\":0," +
                                     "\"uuid\":\"" + petEntity.getUuid() + "\"," +
                                     "\"name\":\"Biggie\"," +
-                                    "\"photo\":null," +
+                                    "\"photo\":\"\"," +
                                     "\"description\":\"Bad boy\"," +
                                     "\"ownerId\":" + ownerEntity.getId() + "}";
         //ACT AND ASSERT
@@ -507,7 +507,7 @@ public class APIPetTests {
                               .andExpect(content().json( "{\"id\":" + petEntity.getId() + "," +
                                                                     "\"uuid\":\"" + petEntity.getUuid() + "\"," +
                                                                     "\"name\":\"Biggie\"," +
-                                                                    "\"photo\":null," +
+                                                                    "\"photo\":\"\"," +
                                                                     "\"description\":\"Bad boy\"," +
                                                                     "\"ownerId\":" + ownerEntity.getId() + "}"))
                               .andDo(MockMvcResultHandlers.print())
@@ -629,12 +629,11 @@ public class APIPetTests {
     }
 
     private String petEntityToJsonString(Pet petEntity) {
-        String stringifiedJsonOfPet =  "{\"id\":" + petEntity.getId() + "," +
-                                        "\"uuid\":\"" + petEntity.getUuid() + "\"," +
-                                        "\"name\":\"" + petEntity.getName() + "\"," +
-                                        "\"photo\":" + petEntity.getPhoto() + "," +
-                                        "\"description\":\"" + petEntity.getDescription() + "\"," +
-                                        "\"ownerId\":" + petEntity.getOwner().getId() + "}";
-        return stringifiedJsonOfPet;
+        return "{\"id\":" + petEntity.getId() + "," +
+                "\"uuid\":\"" + petEntity.getUuid() + "\"," +
+                "\"name\":\"" + petEntity.getName() + "\"," +
+                "\"photo\":\"" + petEntity.getPhoto() + "\"," +
+                "\"description\":\"" + petEntity.getDescription() + "\"," +
+                "\"ownerId\":" + petEntity.getOwner().getId() + "}";
     }
 }
