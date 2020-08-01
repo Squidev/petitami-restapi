@@ -80,9 +80,9 @@ public class APIContactMediumTests {
         ownerRepository.deleteAll();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
-        entityManager.createNativeQuery("ALTER TABLE pet AUTO_INCREMENT = 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE contact_medium AUTO_INCREMENT = 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE owner AUTO_INCREMENT = 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER SEQUENCE pet_id_seq RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER SEQUENCE contact_medium_id_seq RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER SEQUENCE owner_id_seq RESTART WITH 1").executeUpdate();
         entityManager.getTransaction().commit();
         entityManager.close();
     }
