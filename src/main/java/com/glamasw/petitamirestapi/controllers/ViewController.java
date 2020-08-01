@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+@Controller
 public class ViewController {
 
 /*  Web AutoConfiguration is executed when Spring Boot identifies a class with the @Controller annotation.
