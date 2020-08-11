@@ -15,7 +15,7 @@ public class ViewController {
             /static/
             /public/
     https://spring.io/blog/2013/12/19/serving-static-web-content-with-spring-boot*/
-    @RequestMapping(value = {"/","/cliente", "/cliente/**", "/pet/**"})
+    @RequestMapping(value = {"/","/e5de8b99-6195/cliente", "/e5de8b99-6195/cliente/**", "/pet/**"})
     public String getIndex(HttpServletRequest request) {
         return "forward:/index.html";
     }
