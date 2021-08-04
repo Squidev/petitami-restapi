@@ -13,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -37,6 +39,8 @@ public class PetRepositoryTests {
     private static List<Owner> ownerEntitiesForDBPopulation = new ArrayList<>();
     // Por cada DataSource definido existirá un EntityManagerFactory que se utilizará para crear EntityManagers que manejaran las sesiones on demand que utilizaremos
     // para comunicarnos con ese DataSource.
+    // More on EntityManager: https://www.baeldung.com/hibernate-entitymanager
+    // More on JPA entities lifecycle: https://www.javabullets.com/jpa-entity-lifecycle/
     @Autowired
     EntityManagerFactory entityManagerFactory;
     @Autowired
@@ -89,6 +93,7 @@ public class PetRepositoryTests {
 
             For real integration tests (that should behave exactly as in production) the answer is: definitely do not use @Transactional around test. But drawback also
             exists: you have to setup a database into well known state before every such test.
+            Transactional tests considered harmful: https://www.javacodegeeks.com/2011/12/spring-pitfalls-transactional-tests.html
 
      Existen 2 formas de manejar código que deba ejecutarse en un contexto transaccional:
      1. Declarativa: mediante el uso de anotaciones como @Transaccional. La infraestructura de Spring facilita el uso de transacciones, al costo de exponernos a
@@ -100,9 +105,20 @@ public class PetRepositoryTests {
 
      La rule of thumb parece ser utilizar la forma declarativa sólo en métodos de la lógica de negocio para facilitar la implementación de la comunicación con la DB y
      reducir el boilerplate code, y utilizar la forma programática en los tests para simular distintas interacciones según lo que vayamos necesitando.
-
+     También, desde el test se podría llamar a una función anotada con @Transactional(propagation = Propagation.REQUIRES_NEW), la cual se ejecutará wrappeada en una
+     nueva transacción anidada a la original, siendo la primera suspendida hasta que la anidada concluya con su ejecución, efectivamente commiteando los cambios y
+     retornando a la original, desde donde podrán visualizarse los cambios efectivamente realizados en la DB.
+     https://stackoverflow.com/questions/24338150/how-to-manually-force-a-commit-in-a-transactional-method/24341843
+     -------------------------------------
      TO DO: Investigar cómo el EntityManager se relaciona con el mecanismo de las transacciones. Por el momento ya se me fué demasiado tiempo enroscado con este tema,
      y el uso de TransactionTemplate no presentó problemas asi que I'll call it a day.
+
+     When your application runs, the Entity Manager associated with the thread keeps control of modified or added objects, the save() method just do this, it's a mark
+     that says: "this should be saved in the database".
+     The database DML (insert,update,delete) is not sent to the database while you save things, it's done at the end just before commit, it's delayed to the last moment.
+     It's possible the send the DML to the database anytime you like using the Entity Manager's flush() method, in fact you can debug the database log and see your
+     queries going through, but this changes to the database will only be visible within your DB connection until the commit is issued; commit() is a method of the
+     transaction associated to the Entity Manager.
      */
     @BeforeEach //Es necesario reinicializar las entities a persistir debido a que después de cada test terminarán con ids ya establecidos
     void setOwnerEntitiesForDBPopulation() {

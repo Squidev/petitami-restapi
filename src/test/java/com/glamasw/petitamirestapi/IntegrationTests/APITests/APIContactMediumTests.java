@@ -80,9 +80,15 @@ public class APIContactMediumTests {
         ownerRepository.deleteAll();
         EntityManager entityManager = entityManagerFactory.createEntityManager();
         entityManager.getTransaction().begin();
-        entityManager.createNativeQuery("ALTER TABLE pet AUTO_INCREMENT = 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE contact_medium AUTO_INCREMENT = 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE owner AUTO_INCREMENT = 1").executeUpdate();
+        /*In PostgreSQL, if you created the table product with an id column, then the sequence is not simply called product, but rather product_id_seq (that is,
+        ${table}_${column}_seq).
+        This is the ALTER SEQUENCE command you need:
+        ALTER SEQUENCE product_id_seq RESTART WITH 1453
+        You can see the sequences in your database using the \ds command in psql. If you do \d product and look at the default constraint for your column, the nextval(
+        ...) call will specify the sequence name too.*/
+        entityManager.createNativeQuery("ALTER SEQUENCE pet_id_seq RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER SEQUENCE contact_medium_id_seq RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER SEQUENCE owner_id_seq RESTART WITH 1").executeUpdate();
         entityManager.getTransaction().commit();
         entityManager.close();
     }

@@ -26,7 +26,7 @@ public class Pet {
     @Column(name = "description")
     private String description;
     @NotNull
-    @Column(name = "photo", columnDefinition = "MEDIUMTEXT")
+    @Column(name = "photo", columnDefinition = "text")
     private String photo = "";
     @ManyToOne
     @JoinColumn(name = "fk_owner", nullable = false)    //If null, throws DataIntegrityViolationException, with a nested ConstraintViolationException
